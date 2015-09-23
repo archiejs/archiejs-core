@@ -1,5 +1,5 @@
 {
-    "name": "architect",
+    "name": "archie",
     "description": "A Simple yet powerful plugin system for node applications",
     "version": "0.1.12",
     "author": "ajax.org B.V. <info@ajax.org>",
@@ -9,10 +9,10 @@
             "email": "navalnovel@gmail.com"
         }
     ],
-    "main": "architect.js",
+    "main": "archie.js",
     "repository": {
         "type": "git",
-        "url": "http://github.com/c9/architect.git"
+        "url": "https://github.com/flipflopapp/archiejs.git"
     },
     "dependencies": {},
     "devDependencies": {},
@@ -20,7 +20,7 @@
     "licenses": [
         {
             "type": "MIT",
-            "url": "http://github.com/c9/architect/raw/master/LICENSE"
+            "url": "http://github.com/flipflopapp/archiejs/blob/master/LICENSE"
         }
     ]
 }
