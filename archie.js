@@ -262,7 +262,7 @@ var exports = {};
 }());
 
 exports.createApp = createApp;
-exports.Architect = Architect;
+exports.Archie = Archie;
 
 // Check a plugin config list for bad dependencies and throw on error
 function checkConfig(config) {
@@ -359,7 +359,7 @@ function checkCycles(config) {
     return sorted;
 }
 
-function Architect(config) {
+function Archie(config) {
     var app = this;
     app.config = [];
     app.destructors = [];
@@ -382,9 +382,9 @@ function Architect(config) {
     });
 }
 
-Architect.prototype = Object.create(EventEmitter.prototype, {constructor:{value:Architect}});
+Archie.prototype = Object.create(EventEmitter.prototype, {constructor:{value:Archie}});
 
-Architect.prototype.destroy = function() {
+Archie.prototype.destroy = function() {
     var app = this;
 
     app.destructors.forEach(function(destroy) {
@@ -394,7 +394,7 @@ Architect.prototype.destroy = function() {
     app.destructors = [];
 };
 
-Architect.prototype.loadPlugins = function(config, callback) {
+Archie.prototype.loadPlugins = function(config, callback) {
     var app = this;
 
     var sortedConfig;
@@ -431,7 +431,7 @@ Architect.prototype.loadPlugins = function(config, callback) {
 /**
  * Register a plugin in the service
  */
-Architect.prototype.registerPlugin = function(plugin, next) {
+Archie.prototype.registerPlugin = function(plugin, next) {
     var app = this;
     var services = app.services;
 
@@ -491,9 +491,9 @@ Architect.prototype.registerPlugin = function(plugin, next) {
     }
 };
 
-Architect.prototype.getService = function(name) {
+Archie.prototype.getService = function(name) {
     if (!this.services[name]) {
-        throw new Error("Service '" + name + "' not found in architect app!");
+        throw new Error("Service '" + name + "' not found in archie app!");
     }
     return this.services[name];
 };
@@ -508,7 +508,7 @@ Architect.prototype.getService = function(name) {
 function createApp(config, callback) {
     var app;
     try {
-        app = new Architect(config);
+        app = new Archie(config);
     } catch(err) {
         if (!callback) throw err;
         return callback(err, app);
