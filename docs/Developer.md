@@ -64,7 +64,7 @@ Archie object provides a function with the name, getServices. We can use it to a
     plugins: {
         provides: ['give1', ...],
         consumes: ['take1', ...],
-        type: 'one of the possible types'
+        messaging: 'one of the possible types'
     }
 }
 
