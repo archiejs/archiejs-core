@@ -10,7 +10,7 @@ In the initialization phase, an array of config json's is passed to the archie.j
 
 The code starting in line 9 starts. It is the initializing code for archie.js . It kickstarts when a calling nodejs application, makes a call to `loadConfig` or `resolveConfig`. 
 
-loadConfig / resolveConfig
+    loadConfig / resolveConfig
       |
       +-> resolveModule
            |
@@ -27,20 +27,20 @@ loadConfig / resolveConfig
 
 The function `createApp` creates an object internally (`Archie` and returns it to the user app).The constructor of the object calls a function `loadPlugins`, which loads all plugins and calls their setup functions.
 
-createApp
-  |
-  +-> new Archie()
-       |
-       +-> loadPlugins
-           |
-           +-> Sorts the config (line 400)
-           +-> registerPlugin
-               |
-               +-> Checks for dependencies (consumes)
-               +-> Calls plugin.setup function
-               +-> In Register callback (see line 451)
+    createApp
+     |
+     +-> new Archie()
+         |
+         +-> loadPlugins
+             |
+             +-> Sorts the config (line 400)
+             +-> registerPlugin
                  |
-                 +-> Populates a data-structure `services` (in app.services)
+                 +-> Checks for dependencies (consumes)
+                 +-> Calls plugin.setup function
+                 +-> In Register callback (see line 451)
+                     |
+                     +-> Populates a data-structure `services` (in app.services)
 
 ### About Archie object
 
