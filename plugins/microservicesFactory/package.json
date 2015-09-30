@@ -1,0 +1,20 @@
+{
+  "name": "microservicesFactory",
+  "version": "1.0.0",
+  "description": "Messaging systes for archieJs.",
+  "main": "index.js",
+  "plugin": {
+    "consumes": [],
+    "provides": [
+      "archieKueMicroserviceFactory"
+    ]
+  },
+  "scripts": {
+    "test": "node test"
+  },
+  "author": "Naval Saini <navalnovel@gmail.com> (http://www.flipflopapp.com/)",
+  "license": "ISC",
+  "dependencies": {
+    "kue": "^0.9.5"
+  }
+}
