@@ -1,10 +1,10 @@
 'use strict';
 
-var Archie = require('./../../../archiejs');
+var Archie = require('./../../../../archiejs');
 
 var tree = Archie.resolveConfig(
 [{
-    packagePath: './'
+    packagePath: '../'
 }], __dirname);
 
 Archie.createApp(tree, function(err, app){
