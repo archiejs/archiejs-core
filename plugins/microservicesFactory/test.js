@@ -28,8 +28,9 @@ Archie.createApp(tree, function(err, app){
     // create producer - consumer
     var client = kueFactory.makeWrappers(ServiceObj);
     var serviceInst = new ServiceObj();
-    var server = kueFactory.makeHooks(ServiceObj, serviceInst);
+    kueFactory.makeHooks(ServiceObj, serviceInst);
 
+    console.log("making function calls");
     client.func1();
     client.func2();
     client.func3();

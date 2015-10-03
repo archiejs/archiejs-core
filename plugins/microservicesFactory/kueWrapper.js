@@ -1,6 +1,7 @@
 'use strict';
 
 var kue = require('kue');
+var DEBUG = false;
 
 var KueMicroservice = function(config) {
     var serviceName = "test";
@@ -49,7 +50,7 @@ var KueMicroservice = function(config) {
             (function(property){
                 result[property] = function(){
                     // unique service name
-                    var jobKey = this.serviceName + '.' + property;
+                    var jobKey = me.serviceName + '.' + property;
 
                     // pop data from arguments and make RPC call
                     var p = me._parseArguments(arguments);
@@ -74,18 +75,15 @@ var KueMicroservice = function(config) {
         }
 
         // create hooks
-        var result = Object.create({});
         for(var property in ServiceObj.prototype){
             (function(property){
-                result[property] = function(){
-                    // unique hook name
-                    var jobKey = this.serviceName + '.' + property;
+                // unique hook name
+                var jobKey = me.serviceName + '.' + property;
 
-                    // create hook
-                    me.jobsClient.process( jobKey, function(job, cb){
-                        instance[jobKey] (job.data, cb);
-                    });
-                };
+                // create hook
+                me.jobsClient.process( jobKey, function(job, cb){
+                    instance[property] (job.data, cb);
+                });
             })(property);
         }
     };
@@ -132,23 +130,24 @@ var KueMicroservice = function(config) {
         var job = me.jobsClient.create(jobKey, data);
 
         // properties
-        if(p.options.priority){
+        if(options.priority){
             job.priority(options.priority);
         }
-        if(p.options.attempts){
+        if(options.attempts){
             job.priority(options.attempts);
         }
 
         // fire the job
         job.save(function(err){
-            if(err){
-                return cb(err);
-            }
+            if(DEBUG) console.log("job save " + jobKey);
+            if(err) return cb(err);
         })
         .on('failed', function(err){
+            if(DEBUG) console.log("job failed " + jobKey);
             return cb(err);
         })
         .on('complete', function(result){
+            if(DEBUG) console.log("job complete " + jobKey);
             return cb(null, result);
         });
 
