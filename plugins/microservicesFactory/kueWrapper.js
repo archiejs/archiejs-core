@@ -30,17 +30,38 @@ var KueMicroservice = function(config) {
     
     // member variables
     this.serviceName = serviceName;
-    this.jobsClient = kue.createQueue({
-        prefix: config.prefix,
-        redis: config.server
-    });
+    this.config = config;
 
+    this.openClient();
     process.once( 'SIGTERM', function (sig) {
         me.closeClient();
     });
 };
 
 (function(){
+    this.openClient = function(cb){
+        this.jobsClient = kue.createQueue({
+            prefix: this.config.prefix,
+            redis: this.config.server
+        });
+    };
+
+    this.closeClient = function(cb){
+        var me = this;
+        if(me.jobsClient){
+            me.jobsClient.shutdown(KUE_TIMEOUT, function(err){
+                me.jobsClient = null;
+                cb && cb(err);
+            });
+        }else{
+            cb && cb();
+        } 
+    };
+
+    this.getClient = function(){
+        return this.jobsClient;
+    };
+
     this.makeWrappers = function(ServiceObj){
         var me = this;
  
@@ -94,18 +115,6 @@ var KueMicroservice = function(config) {
                     instance[property] (job.data, cb);
                 });
             });
-    };
-
-    this.closeClient = function(cb){
-        var me = this;
-        if(me.jobsClient){
-            me.jobsClient.shutdown(KUE_TIMEOUT, function(err){
-                me.jobsClient = null;
-                cb && cb(err);
-            });
-        }else{
-            cb && cb();
-        } 
     };
 
     this._parseArguments = function(){

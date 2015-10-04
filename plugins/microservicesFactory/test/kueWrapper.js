@@ -46,7 +46,8 @@ describe('Kue Redis Wrapper Testcases:', function(){
 
     describe('#creation', function(){
         it('creates a queue', function(done){
-            expect(kueFactory.jobsClient).to.not.equal(null);
+            var client = kueFactory.getClient();
+            expect(client).to.not.equal(null);
             done();
         });
     });
@@ -54,8 +55,9 @@ describe('Kue Redis Wrapper Testcases:', function(){
     describe('#closing', function(){
         it('closes the redis client and queue', function(done){
             kueFactory.closeClient(function(err){
+                var client = kueFactory.getClient();
                 expect(err).to.not.equal(null);
-                expect(kueFactory.jobsClient).to.equal(null);
+                expect(client).to.equal(null);
             });
             done();
         });
