@@ -33,6 +33,9 @@ var KueMicroservice = function(config) {
     this.config = config;
 
     this.openClient();
+
+    // todo
+    // check - is it better to register/unregister this in open/closeClient
     process.once( 'SIGTERM', function (sig) {
         me.closeClient();
     });
