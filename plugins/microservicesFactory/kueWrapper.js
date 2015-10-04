@@ -1,7 +1,9 @@
 'use strict';
 
 var kue = require('kue');
+
 var DEBUG = false;
+var KUE_TIMEOUT = 5000;
 
 var KueMicroservice = function(config) {
     var serviceName = "test";
@@ -32,6 +34,10 @@ var KueMicroservice = function(config) {
         prefix: config.prefix,
         redis: config.server
     });
+
+    process.once( 'SIGTERM', function (sig) {
+        me.closeClient();
+    });
 };
 
 (function(){
@@ -46,8 +52,8 @@ var KueMicroservice = function(config) {
 
         // create wrapper
         var result = Object.create({});
-        for(var property in ServiceObj.prototype){
-            (function(property){
+        Object.keys(ServiceObj.prototype)
+            .forEach(function(property){
                 result[property] = function(){
                     // unique service name
                     var jobKey = me.serviceName + '.' + property;
@@ -56,8 +62,7 @@ var KueMicroservice = function(config) {
                     var p = me._parseArguments(arguments);
                     me._fireJob(jobKey, p.data, p.options, p.callback);
                 };
-            })(property);
-        };
+            });
         return result;
     };
 
@@ -73,10 +78,14 @@ var KueMicroservice = function(config) {
             var err = new Error("no service instance provided");
             throw err;
         }
+        if(this.jobsClient == null){
+            var err = new Error("redis client was closed");
+            throw err;
+        }
 
         // create hooks
-        for(var property in ServiceObj.prototype){
-            (function(property){
+        Object.keys(ServiceObj.prototype)
+            .forEach(function(property){
                 // unique hook name
                 var jobKey = me.serviceName + '.' + property;
 
@@ -84,8 +93,19 @@ var KueMicroservice = function(config) {
                 me.jobsClient.process( jobKey, function(job, cb){
                     instance[property] (job.data, cb);
                 });
-            })(property);
-        }
+            });
+    };
+
+    this.closeClient = function(cb){
+        var me = this;
+        if(me.jobsClient){
+            me.jobsClient.shutdown(KUE_TIMEOUT, function(err){
+                me.jobsClient = null;
+                cb && cb(err);
+            });
+        }else{
+            cb && cb();
+        } 
     };
 
     this._parseArguments = function(){
