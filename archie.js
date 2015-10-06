@@ -40,6 +40,7 @@ var exports = {};
             if (typeof plugin === "string") {
                 plugin = config[index] = { packagePath: plugin };
             }
+
             // The plugin is a package on the disk.  We need to load it.
             if (plugin.hasOwnProperty("packagePath") && !plugin.hasOwnProperty("setup")) {
                 var defaults = resolveModuleSync(base, plugin.packagePath);
@@ -48,8 +49,19 @@ var exports = {};
                         plugin[key] = defaults[key];
                     }
                 });
-                plugin.packagePath = defaults.packagePath;
+
+                // if no, don't load setup function, etc and create hooks
+                plugin.packagePath = defaults.packagePath; // now has the file to load
                 plugin.setup = require(plugin.packagePath);
+                
+                // if the plugin uses package wrappers
+                if (plugin.hasOwnProperty("packageWrapper")){
+                    var wrapperDefaults = resolveWrappedServices(base, plugin);
+                    plugin.packageWrapper = wrapperDefaults.packageWrapper;
+                    plugin.packageRole = wrapperDefaults.packageRole;
+                    plugin.wrapperSetups = wrapperDefauls.setups;
+                    plugin.provides = wrapperDefaults.provides;
+                }
             }
         });
         return config;
@@ -67,9 +79,10 @@ var exports = {};
             if (typeof plugin === "string") {
                 plugin = config[i] = { packagePath: plugin };
             }
+
             // The plugin is a package on the disk.  We need to load it.
             if (plugin.hasOwnProperty("packagePath") && !plugin.hasOwnProperty("setup")) {
-                resolveModule(base, plugin.packagePath, function(err, defaults) {
+                resolveModuleAsync(base, plugin.packagePath, function(err, defaults) {
                     if (err) return callback(err);
 
                     Object.keys(defaults).forEach(function (key) {
@@ -82,6 +95,15 @@ var exports = {};
                         plugin.setup = require(plugin.packagePath);
                     } catch(e) {
                         return callback(e);
+                    }
+                
+                    // if the plugin uses package wrappers
+                    if (plugin.hasOwnProperty("packageWrapper")){
+                        var wrapperDefaults = resolveWrappedServices(base, plugin);
+                        plugin.packageWrapper = wrapperDefaults.packageWrapper;
+                        plugin.packageRole = wrapperDefaults.packageRole;
+                        plugin.wrapperSetups = wrapperDefauls.setups;
+                        plugin.provides = wrapperDefaults.provides;
                     }
 
                     return resolveNext(++i);
@@ -120,8 +142,8 @@ var exports = {};
 
     // Loads a module, getting metadata from either it's package.json or export
     // object.
-    function resolveModule(base, modulePath, callback) {
-        resolvePackage(base, modulePath + "/package.json", function(err, packagePath) {
+    function resolveModuleAsync(base, modulePath, callback) {
+        resolvePackageAsync(base, modulePath + "/package.json", function(err, packagePath) {
             //if (err && err.code !== "ENOENT") return callback(err);
 
             var metadata = {};
@@ -136,13 +158,13 @@ var exports = {};
             (function(next) {
                 if (err) {
                     //@todo Fabian what is a better way?
-                    resolvePackage(base, modulePath + ".js", next);
+                    resolvePackageAsync(base, modulePath + ".js", next);
                 }
                 else if (packagePath) {
                     next(null, dirname(packagePath));
                 }
                 else {
-                    resolvePackage(base, modulePath, next);
+                    resolvePackageAsync(base, modulePath, next);
                 }
             })(function(err, modulePath) {
                 if (err) return callback(err);
@@ -203,7 +225,7 @@ var exports = {};
         throw err;
     }
 
-    function resolvePackage(base, packagePath, callback) {
+    function resolvePackageAsync(base, packagePath, callback) {
         var originalBase = base;
         if (!packagePathCache.hasOwnProperty(base)) {
             packagePathCache[base] = {};
@@ -258,6 +280,41 @@ var exports = {};
                 }
             });
         }
+    }
+
+    // Load all objects that are provided by the module (they will be consumed by wrapper)
+    function resolveWrappedServices(base, plugin){
+        // metadata has provides, consumes and services keys
+        if (typeof plugin.provides !== "object") {
+            throw new Error("A wrapped object has provides in key-value pair (json format). See archiejs documentation - docs/plugins.md.");
+        }
+
+        var modulePath = plugin.packagePath;
+        var provides = Object.keys(wrappers);
+        var wrappers = {};
+        
+        // iterate over wrappers and resolve files to be wrapped
+        for(var serviceName in plugin.provides) {
+            var serviceFile = modulePath + "/" + plugin.provides[serviceName];
+            try {
+                var servicePath = resolvePackageSync(base, serviceFile);
+                wrappers[serviceName] = require(servicePath);
+            } catch(err) {
+                if (err.code !== "ENOENT") throw err;
+            }
+        }
+
+        // resolve packageWrapper
+        var packageWrapper = archieWrappers[plugin.packageWrapper];
+        var packageRole = plugin.packageRole;
+
+        var meta = {
+            provides: provides,
+            setups: wrappers,
+            packageWrapper: packageWrapper,
+            packageRole: packageRole
+        };
+        return meta;
     }
 }());
 
