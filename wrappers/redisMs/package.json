@@ -1,13 +1,9 @@
 {
-  "name": "microservicesFactory",
+  "name": "redisMicroWrapper",
   "version": "1.0.0",
-  "description": "Messaging systes for archieJs.",
-  "main": "index.js",
-  "plugin": {
-    "consumes": [],
-    "provides": [
-      "archieKueMicroserviceFactory"
-    ]
+  "description": "Redis messaging systems for archieJs.",
+  "wrappers": {
+    "kueWrapper": "./kueWrapper.js"
   },
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha test"

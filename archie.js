@@ -24,7 +24,8 @@ var exports = {};
       var config = require(configPath);
       var base = dirname(configPath);
 
-      return resolveConfig(config, base, callback);
+      var ext_config = resolveDefaultWrappers(config, base, callback);
+      return resolveConfig(ext_config, base, callback);
     }
 
     function resolveConfig(config, base, callback) {
@@ -284,37 +285,9 @@ var exports = {};
 
     // Load all objects that are provided by the module (they will be consumed by wrapper)
     function resolveWrappedServices(base, plugin){
-        // metadata has provides, consumes and services keys
-        if (typeof plugin.provides !== "object") {
-            throw new Error("A wrapped object has provides in key-value pair (json format). See archiejs documentation - docs/plugins.md.");
-        }
-
-        var modulePath = plugin.packagePath;
-        var provides = Object.keys(wrappers);
-        var wrappers = {};
-        
-        // iterate over wrappers and resolve files to be wrapped
-        for(var serviceName in plugin.provides) {
-            var serviceFile = modulePath + "/" + plugin.provides[serviceName];
-            try {
-                var servicePath = resolvePackageSync(base, serviceFile);
-                wrappers[serviceName] = require(servicePath);
-            } catch(err) {
-                if (err.code !== "ENOENT") throw err;
-            }
-        }
-
-        // resolve packageWrapper
-        var packageWrapper = archieWrappers[plugin.packageWrapper];
-        var packageRole = plugin.packageRole;
-
-        var meta = {
-            provides: provides,
-            setups: wrappers,
-            packageWrapper: packageWrapper,
-            packageRole: packageRole
-        };
-        return meta;
+        var packageWrapperInst = archieWrappers[plugin.packageWrapper];
+        packageWrapperInst.resolveConfig(base, plugin);
+        plugin.packageWrapper = packageWrapperInst;
     }
 }());
 

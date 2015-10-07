@@ -16,7 +16,7 @@ The code starting in line 9 starts. It is the initializing code for archie.js . 
            |
            +-> resolvePackage
 
-1. `resolveConfig` loads each of the plugin in the config file. It stores a pointer to `setup` function to the each package (in the config json)/
+1. `resolveConfig` loads each of the plugin in the config file. It stores a pointer to `setup` function to the each package (in the config json).
 2. To find the `setup` function of the package, `resolveConfig` uses `resolveModeule`.
 3. `resolveModule` loads tags from package.json (provides, consumes, etc) and adds them to config data structure.
 4. `resolvePackage` checks if the files for the package exist.

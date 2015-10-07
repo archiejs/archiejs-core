@@ -32,7 +32,7 @@ describe('Kue Redis Wrapper Testcases:', function(){
         Archie.createApp(tree, function(err, app){
             if(err)
                 return console.log(err);
-            KueWrapperFactory = app.getService("archieKueMicroserviceFactory");
+            KueWrapperFactory = app.getService("kueMicroserviceWrapper");
         });
     });
 

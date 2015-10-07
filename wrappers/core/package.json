@@ -1,0 +1,14 @@
+{
+  "name": "core",
+  "main": "index.js",
+  "version": "1.0.0",
+  "description": "core wrapper classes.",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Naval Saini <navalnovel@gmail.com> (http://www.flipflopapp.com/)",
+  "license": "ISC"
+}
