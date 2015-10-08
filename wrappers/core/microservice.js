@@ -4,22 +4,12 @@ var BaseWrapper = require('./base');
 
 var MicroservWrapper = function(){
     BaseWrapper.call(this);
+    this.wrapperName = "microservice";
 };
 
 MicroservWrapper.extends(BaseWrapper);
 
 (function(){
-
-    /*
-     * Overridden functions
-     */
-    
-    this.registerWrapper = function(wrapperManager){
-        wrapperManager.register(null,
-        {
-            "microservice": this
-        });
-    };
 
     /* resolveConfig function does following :-
      *

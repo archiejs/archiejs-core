@@ -7,7 +7,11 @@
     "test": "test"
   },
   "scripts": {
-    "test": "test"
+    "test": "./node_modules/mocha/bin/mocha test"
+  },
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3"
   },
   "author": "Naval Saini <navalnovel@gmail.com> (http://www.flipflopapp.com/)",
   "license": "ISC"

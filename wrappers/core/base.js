@@ -1,21 +1,12 @@
 'use strict';
-require('./misc.js');
 
-var BaseWrapper = function(wrapperManager){
-    this.registerWrapper(wrapperManager);
+var resolve = require('path').resolve;
+
+var BaseWrapper = function(){
+    this.wrapperName = "base";
 };
 
 (function(){
-
-    /* Register the wrapper in wrapper manager
-     */
-
-    this.registerWrapper = function(wrapperManager){
-        wrapperManager.register(null,
-        {
-            "base": this
-        });
-    };
 
     /* resolveConfig modifies the config structure
      * and resolves various dependencies to code
@@ -25,22 +16,41 @@ var BaseWrapper = function(wrapperManager){
      * for a wrapped plugin (in resolveConfig in archie.js).
      */
 
-    this.resolveConfig = function(plugin){
-        var modulePath = plugin.packagePath;
-        var provides = plugin.provides;
+    this.resolveConfig = function(plugin, base){
+        if(!base) 
+            base = __dirname;
 
-        if(typeof provides === 'array' || typeof provides === 'string'){
+        if(!plugin.packagePath) 
+            throw new Error('packagePath missing in plugin');
+
+        if(!plugin.consumes)
+            plugin.consumes = [];
+
+        if(!plugin.provides)
+            plugin.provides = [];
+
+        if(typeof plugin.consumes === 'string')
+            plugin.consumes = [ plugin.consumes ];
+
+        if(typeof plugin.provides === 'string')
+            plugin.provides = [ plugin.provides ];
+        
+        if(Array.isArray(plugin.provides))
             return; // nothing to do
+
+        // provides is a json ( of type, serviceName : file )
+
+        var modulePath = plugin.packagePath;
+        var provides = Object.keys(plugin.provides);
+        var consumes = plugin.consumes;
+        var serviceMap = {};
+
+        for(var serviceName in plugin.provides){
+            var servicePath = resolve(base, modulePath, plugin.provides[serviceName]);
+            serviceMap[serviceName] = require(servicePath);
         }
 
-        provides = Object.keys(plugin.provides);
-        var interfaces = {};
-        for(var name in plugin.provides){
-            var servicePath = modulePath + "/" + plugin.provides[name];
-            interfaces[serviceName] = require(servicePath);
-        }
-
-        plugin.interfaces = interfaces;
+        plugin.interfaces = serviceMap;
         plugin.provides = provides;
     };
 
@@ -60,25 +70,27 @@ var BaseWrapper = function(wrapperManager){
      */
 
     this.setupPlugin = function(plugin, imports, register){
-        var interfaces = plugin.interfaces;
-        var setup = plugin.setup;
-
-        if(!interfaces){
-            // no interfaces are provided
-            return plugin.setup.call(plugin, imports, regsiter);
-        }
-
-        try {
-            var serviceInstances = {};
-            for(var name in interfaces){
-                var theServiceInst = new interfaces[name];
-                serviceInstances[name] = theServiceInstance;
+        // this function registers the interfaces
+        var registerInterfaces = function(err, _serviceInstances){
+            if(plugin.interfaces) {
+                try {
+                    for(var serviceName in plugin.interfaces){
+                        var instance = new plugin.interfaces[serviceName](plugin, imports, register);
+                        _serviceInstances[serviceName] = instance;
+                    }
+                }catch(err){
+                    return register(err);
+                }
             }
-        }catch(err){
-            return register(err);
+            return register(null, _serviceInstances);
         }
 
-        return register(null, serviceInstances);
+        if(plugin.setup){
+            // no interfaces are provided
+            return plugin.setup.call(plugin, imports, registerInterfaces);
+        }else{
+            return registerInterfaces(null, {});
+        }
     };
 
 }).call(BaseWrapper.prototype);
