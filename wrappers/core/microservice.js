@@ -107,15 +107,27 @@ MicroservWrapper.ERR_MSG = "\n\
         }
     };
 
+    this.setupPluginClient = function(plugin, imports, register){
+        var me = this;
+        Object.keys(plugin.interfaces) // each service
+        .forEach(function(serviceName){
+            var ServiceObj = plugin.interfaces[serviceName];
+            Object.keys(ServiceObj.prototype) // wrap exposed functions
+            .forEach(function(functionName){
+                ServiceObj.prototype[functionName] = me.makePluginWrapper(serviceName, functionName);
+            });
+        });
+    };
+    
     /*
      * Abstract function
      */
-
-    this.setupPluginClient = function(plugin, imports, register){
+    
+    this.makePluginWrapper = function(serviceName, functionName){
         throw new Error("override");
     };
 
-    this.setupPluginServer = function(plugin, imports, register){
+    this.makePluginHook = function(serviceName, functionName){
         throw new Error("override");
     };
 
@@ -131,12 +143,42 @@ MicroservWrapper.ERR_MSG = "\n\
         throw new Error("override");
     };
 
-    this.makeWrappers = function(Service){
-        throw new Error("override");
-    };
+    /* Misc functions
+     */
 
-    this.makeHooks = function(Service, instance){
-        throw new Error("override");
+    this.parseArguments = function(){
+        // get all keys in arguments, etc
+        var data = {};
+        var keys = [];
+        for(var key in arguments) {
+            data[key] = arguments[key];
+            keys.push(key);
+        }
+        var optionIdx = keys.pop();
+        var cbIdx = keys.pop();
+
+        // parse arguments
+        var cb;
+        var options = arguments[optionIdx];
+        if (typeof(options) == 'function') {
+            cb = options;
+            options = {};
+            delete data[optionIdx];
+        } else {
+            cb = arguments[cbIdx];
+            if (typeof(cb) != 'function') {
+                cb = function() {}; // does nothing
+            }else{
+                delete data[cbIdx];
+            }
+        }
+
+        // return values
+        return {
+            data: data,
+            options: options,
+            callback: cb
+        };
     };
 
 }).call(MicroservWrapper.prototype);
