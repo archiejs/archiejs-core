@@ -1,5 +1,4 @@
 'use strict';
-
 var resolve = require('path').resolve;
 
 var BaseWrapper = function(){
@@ -17,7 +16,7 @@ var BaseWrapper = function(){
      */
 
     this.resolveConfig = function(plugin, base){
-        if(!base) 
+        if(!base)
             base = __dirname;
 
         if(!plugin.packagePath) 
@@ -34,7 +33,7 @@ var BaseWrapper = function(){
 
         if(typeof plugin.provides === 'string')
             plugin.provides = [ plugin.provides ];
-        
+
         if(Array.isArray(plugin.provides))
             return; // nothing to do
 

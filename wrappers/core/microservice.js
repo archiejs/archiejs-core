@@ -1,4 +1,5 @@
 'use strict';
+var resolve = require('path').resolve;
 
 var BaseWrapper = require('./base');
 
@@ -9,6 +10,20 @@ var MicroservWrapper = function(){
 
 MicroservWrapper.extends(BaseWrapper);
 
+// static vars
+MicroservWrapper.ERR_MSG = "\n\
+  WARNING! `provides` structure is empty or incorrect. \n\
+  In case of a microservice, `provides` should have structure as below:- \n\n\
+  provides: { \n\
+    ObjA: { \n\
+      implementaton: 'fileImpl.js', \n\
+      interface: 'inter.js' \n\
+    }, \n\
+    ObjB: 'impl_and_interface.js', \n\
+    ... \n\
+  }\n";
+
+// public members
 (function(){
 
     /* resolveConfig function does following :-
@@ -23,18 +38,34 @@ MicroservWrapper.extends(BaseWrapper);
      * made and microservices are disabled.
      */
 
-    this.resolveConfig = function(base, plugin){
-        var modulePath = plugin.packagePath;
+    this.resolveConfig = function(plugin, base){
+        if(!plugin.consumes)
+            plugin.consumes = [];
+
+        if(typeof plugin.consumes === 'string')
+            plugin.consumes = [ plugin.consumes ];
+
+        if(!plugin.provides){
+            plugin.provides = [];
+            plugin.interfaces = {};
+            console.log(MicroservWrapper.ERR_MSG);
+            return;
+        }
+
+        if(!base)
+            base = __dirname;
+
         var provides = Object.keys(plugin.provides);
+        var modulePath = plugin.packagePath;
         var interfaces = {};
 
         // parse the interfaces
 
-        for(var name in plugin.provides){
-            var serviceFile = plugin.provides[name];
+        for(var serviceName in plugin.provides){
+            var serviceFile = plugin.provides[serviceName];
             if(typeof serviceFile === 'object'){ // object
                 if(serviceFile.implementation === null && serviceFile.interface === null){
-                    console.log("Skipping " + name);
+                    console.log("Skipping " + serviceName);
                     console.log("Please provide the implementation and interface files properly.");
                     continue; // skip
                 }
@@ -50,7 +81,7 @@ MicroservWrapper.extends(BaseWrapper);
                 }
             }
 
-            var servicePath = modulePath + "/" + filename;
+            var servicePath = resolve(base, modulePath, serviceFile);
             interfaces[serviceName] = require(servicePath);
         }
 
@@ -59,7 +90,9 @@ MicroservWrapper.extends(BaseWrapper);
             plugin.provides = provides;
         }else if(plugin.packageRole === 'server'){
             plugin.provides = [];
-        } 
+        }else{ // default
+            plugin.provides = provides;
+        }
 
         plugin.interfaces = interfaces;
     };
@@ -70,7 +103,7 @@ MicroservWrapper.extends(BaseWrapper);
         } else if (plugin.packageRole === 'server'){
             this.setupPluginServer(plugin, imports, register);
         } else {
-            BaseWrapper.setupPlugin.call(this, plugin, imports, register);
+            this.super.setupPlugin.call(this, plugin, imports, register);
         }
     };
 
@@ -78,11 +111,11 @@ MicroservWrapper.extends(BaseWrapper);
      * Abstract function
      */
 
-    this.setupPluginClient(plugin, imports, register){
+    this.setupPluginClient = function(plugin, imports, register){
         throw new Error("override");
     };
 
-    this.setupPluginServer(plugin, imports, register){
+    this.setupPluginServer = function(plugin, imports, register){
         throw new Error("override");
     };
 
