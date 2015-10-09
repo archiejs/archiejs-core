@@ -6,6 +6,7 @@ var BaseWrapper = require('./base');
 var MicroservWrapper = function(){
     BaseWrapper.call(this);
     this.wrapperName = "microservice";
+    return this;
 };
 
 MicroservWrapper.extends(BaseWrapper);
@@ -129,17 +130,20 @@ MicroservWrapper.ERR_MSG2 = "\n\
         Object.keys(plugin.wrappers) // each service
         .forEach(function(serviceName){
             // create an object that wraps each wrapper function
+            var WrapperObj = function(){};
+
+            // add functions to wrapper object
             var ServiceObj = plugin.wrappers[serviceName];
             var proto = (ServiceObj.prototype) ? (ServiceObj.prototype) : (ServiceObj); // is an object or instance?
             Object.keys(proto) // wrap exposed functions
             .forEach(function(functionName){
                 if(proto[functionName]) { // is not false
-                    ServiceObj.prototype[functionName] = me.makePluginWrapper(serviceName, functionName);
+                    WrapperObj.prototype[functionName] = me.makePluginWrapper(serviceName, functionName);
                 }
             });
 
             // create an wrapper
-            plugin.wrappers[serviceName] = new ServiceObj(plugin, imports);
+            plugin.wrappers[serviceName] = new WrapperObj(plugin, imports);
         });
         register(null, plugin.wrappers);
     };
@@ -162,14 +166,22 @@ MicroservWrapper.ERR_MSG2 = "\n\
             };
             
             // implementation
-            var instance = plugin.implementations[serviceName];
+            var serviceInstance;
+            var ServiceObj = plugin.implementations[serviceName];
             var wrap = plugin.wrappers[serviceName];
-            if (serviceInst.prototype){ // if this is an object
-                plugin.implementations[serviceName] = instance;
-                serviceInst = new ServiceObj(plugin, imports);
+            if (ServiceObj.prototype){ // if this is an object
+                serviceInstance = new ServiceObj(plugin, imports); // make an instance
+            }else{
+                serviceInstance = ServiceObj; // is an instance
             }
-            makeHooksFn(serviceName, wrap, instance)(); // make hooks
+            plugin.implementations[serviceName] = serviceInstance;
+            makeHooksFn(serviceName, wrap, serviceInstance)(); // make hooks
         });
+
+        // microservice server plugin does not provide these functions
+        // via provides interface, to avoid various entry points into these
+        // functions (keeps things simple).
+        register(null, {});
     };
     
     /*

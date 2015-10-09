@@ -9,11 +9,12 @@ var MicroWrapper = require('./../microservice.js');
 var ServiceObj = require('./serviceObj1.js');
 var ServiceIntf = require('./serviceIntf.js');
 
-/*
- * Derived Microservice Wrapper
- */
+/***
+ * Derived Microservice Wrapper 
+ ***/
 var DerivedMSWrapper = function(){
     MicroWrapper.call(this);
+    this.keys = [];
 };
 DerivedMSWrapper.extends(MicroWrapper);
 DerivedMSWrapper.prototype.makePluginWrapper = function(serviceName, functionName){
@@ -22,7 +23,7 @@ DerivedMSWrapper.prototype.makePluginWrapper = function(serviceName, functionNam
 };
 DerivedMSWrapper.prototype.makePluginHook = function(serviceName, functionName){
     var key = serviceName + "." + functionName;
-    return function() { return key; };
+    this.keys.push(key);
 };
 /*** end ***/
 
@@ -158,8 +159,8 @@ describe('Microservice Wrapper Testcases:', function(){
                     }
                     var client = serviceMap.Obj1;
                     client.func1().should.equal('Obj1.func1');
-                    client.func2().should.equal('Obj2.func2');
-                    client.func3().should.equal('Obj3.func3');
+                    client.func2().should.equal('Obj1.func2');
+                    client.func3().should.equal('Obj1.func3');
                     done();
                 }
             );
@@ -178,14 +179,14 @@ describe('Microservice Wrapper Testcases:', function(){
             };
             microWrapper.resolveConfig(config);
             microWrapper.setupPlugin(config, {},
-                function(err, serviceMap){
+                function(err){
                     if(err){
                         throw err;
                     }
-                    var server = serviceMap.Obj1;
-                    server.func1().should.equal('Obj1.func1');
-                    server.func2().should.equal('Obj2.func2');
-                    server.func3().should.equal('Obj3.func3');
+                    microWrapper.keys.should.have.length(3);
+                    microWrapper.keys.should.contain('Obj1.func1');
+                    microWrapper.keys.should.contain('Obj1.func2');
+                    microWrapper.keys.should.contain('Obj1.func3');
                     done();
                 }
             );
