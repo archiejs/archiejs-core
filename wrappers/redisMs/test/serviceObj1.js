@@ -5,16 +5,19 @@ var ServiceObj = function(){
 };
 
 (function(){
-    this.func1 = function(){
+    this.func1 = function(done){
         this.func1_count++;
+        done();
     };
 
-    this.func2 = function(){
+    this.func2 = function(done){
         this.func2_count++;
+        done();
     };
     
-    this.func3 = function(){
+    this.func3 = function(done){
         this.func3_count++;
+        done();
     };
 }).call(ServiceObj.prototype);
 

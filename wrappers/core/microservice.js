@@ -1,6 +1,6 @@
 'use strict';
 var resolve = require('path').resolve;
-var DEBUG = true;
+var DEBUG = false;
 
 var BaseWrapper = require('./base');
 
@@ -226,7 +226,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
     /* Misc functions
      */
 
-    this.parseArguments = function(){
+    this.parseArgumentsArray = function(){
         // get all keys in arguments, etc
         var data = {};
         var keys = [];
@@ -259,6 +259,18 @@ MicroservWrapper.ERR_MSG2 = "\n\
             options: options,
             callback: cb
         };
+    };
+
+    this.createArgumentsArray = function(data, cb){
+        if(!data) {
+            data = {};
+        }
+        var results = [];
+        for(var key in data){
+            results.push(data[key]);
+        }
+        results.push(cb);
+        return results;
     };
 
 }).call(MicroservWrapper.prototype);

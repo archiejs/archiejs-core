@@ -34,7 +34,7 @@ Your config should have following fields.  \n\
   }";
 
 (function(){
-    
+
     this.setupPlugin = function(plugin, imports, register){
         // open redis session first
         if(!plugin.prefix) plugin.prefix="";
@@ -43,7 +43,7 @@ Your config should have following fields.  \n\
             prefix: plugin.prefix
         };
         this.openClient();
-       
+
         // this uses the redis session
         this.super.setupPlugin.call(this, plugin, imports, register);
     };
@@ -76,11 +76,13 @@ Your config should have following fields.  \n\
         // unique service name
         var jobKey = serviceName + '.' + functionName;
         var me = this;
-
+        
         // return a wrapper function that fires the job
         return function(){
+                //console.log("called " + jobKey);
+
                 // pop data from arguments and make RPC call
-                var _a = me.parseArguments(arguments);
+                var _a = me.parseArgumentsArray(arguments);
                 var data = _a.data;
                 var options = _a.options;
                 var cb = _a.callback;
@@ -118,10 +120,12 @@ Your config should have following fields.  \n\
     this.makePluginHook = function(serviceName, functionName, serviceInstance){
         // unique service name
         var jobKey = serviceName + '.' + functionName;
+        var me = this;
 
         // create hook
-        this.jobsClient.process( jobKey, function(job, cb){
-            serviceInstance[jobKey] (job.data, cb);
+        this.jobsClient.process( jobKey, function(job, done){
+            var _arguments = me.createArgumentsArray(job.data, done);
+            serviceInstance[functionName].apply(serviceInstance, _arguments);
         });
     };
 
