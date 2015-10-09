@@ -13,7 +13,7 @@ var KueWrapper = require('./../').KueWrapper;
 var kueWrapper;
 
 // redis config
-var config = {
+var redisConfig = {
     prefix: 'a',
     server: {
         host: '127.0.0.1',
@@ -33,6 +33,7 @@ describe('Kue Wrapper Testcases:', function(){
 
     it('#makes rpc calls', function(done){
         // create producer - consumer
+        var serviceInstances;
         var config = {
             packagePath: 'test',
             provides: {
@@ -41,7 +42,9 @@ describe('Kue Wrapper Testcases:', function(){
                     interface: 'serviceObj1'
                 },
                 'Obj2': 'serviceObj2'
-            }
+            },
+            server: redisConfig.server,
+            prefix: redisConfig.prefix
         };
         var configClient = JSON.parse(JSON.stringify(config));
         var configServer = JSON.parse(JSON.stringify(config));
@@ -65,7 +68,12 @@ describe('Kue Wrapper Testcases:', function(){
             },
             function(cb){
                 // check resolveConfig setupPlugin
-                kueWrapper.setupPlugin(configServer, {}, cb);
+                kueWrapper.setupPlugin(configServer, {},
+                    function(err, services){
+                        serviceInstances = services;
+                        cb(); 
+                    }
+                );
             },
             function(cb){
                 // check setupPlugin client
@@ -74,16 +82,18 @@ describe('Kue Wrapper Testcases:', function(){
                         if(err) {
                             throw err;
                         }
+
                         serviceMap.should.have.property('Obj1');
                         serviceMap.should.have.property('Obj2');
 
                         serviceMap.Obj1.func1();
                         serviceMap.Obj1.func2();
                         serviceMap.Obj1.func3();
-                
-                        expect(serviceMap.func1_count).to.equal(1);
-                        expect(serviceMap.func2_count).to.equal(1);
-                        expect(serviceMap.func3_count).to.equal(1);
+
+                        serviceInstances.Obj1.func1_count.should.equal(1);
+                        serviceInstances.Obj1.func2_count.should.equal(1);
+                        serviceInstances.Obj1.func3_count.should.equal(1);
+
                         cb();
                     }
                 );

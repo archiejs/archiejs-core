@@ -1,7 +1,11 @@
 'use strict';
 var resolve = require('path').resolve;
+var kue = require('kue');
 
 var MicroserviceWrapper = require('./../core').MicroserviceWrapper;
+
+var KUE_TIMEOUT = 5000;
+var DEBUG = false;
 
 var KueWrapper = function(){
     MicroserviceWrapper.call(this);
@@ -32,18 +36,20 @@ Your config should have following fields.  \n\
 (function(){
     
     this.setupPlugin = function(plugin, imports, register){
-        this.super.setupPlugin.call(this, plugin, imports, register);
-
+        // open redis session first
         if(!plugin.prefix) plugin.prefix="";
         this.redisConfig = {
             redis: plugin.server,
             prefix: plugin.prefix
         };
         this.openClient();
+       
+        // this uses the redis session
+        this.super.setupPlugin.call(this, plugin, imports, register);
     };
 
     this.openClient = function(){
-        if(!plugin.server || !plugin.server.host || !plugin.server.port){
+        if(!this.redisConfig.redis || !this.redisConfig.redis.host || !this.redisConfig.redis.port){
             console.log(KueWrapper.HELP_MSG);
             throw new Error("Archiejs kue wrapper plugin error");
         }
@@ -69,25 +75,25 @@ Your config should have following fields.  \n\
     this.makePluginWrapper = function(serviceName, functionName){
         // unique service name
         var jobKey = serviceName + '.' + functionName;
+        var me = this;
 
         // return a wrapper function that fires the job
-        return
-            (function() {
+        return function(){
                 // pop data from arguments and make RPC call
-                var _a = this.parseArguments(arguments);
+                var _a = me.parseArguments(arguments);
                 var data = _a.data;
                 var options = _a.options;
                 var cb = _a.callback;
 
                 // create a job
-                var job = me.jobsClient.create(jobKey, _a.data);
+                var job = me.jobsClient.create(jobKey, data);
 
                 // properties
-                if(_a.options.priority){
-                    job.priority(_a.options.priority);
+                if(options.priority){
+                    job.priority(options.priority);
                 }
-                if(_a.options.attempts){
-                    job.priority(_a.options.attempts);
+                if(options.attempts){
+                    job.priority(options.attempts);
                 }
 
                 // fire the job
@@ -106,7 +112,7 @@ Your config should have following fields.  \n\
 
                 // return to user to update any options
                 return job;
-            });
+            };
     };
 
     this.makePluginHook = function(serviceName, functionName, serviceInstance){

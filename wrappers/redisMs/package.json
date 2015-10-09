@@ -15,5 +15,8 @@
     "mocha": "^2.3.3"
   },
   "author": "Naval Saini <navalnovel@gmail.com> (http://www.flipflopapp.com/)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "kue": "^0.9.6"
+  }
 }

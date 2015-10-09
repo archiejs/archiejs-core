@@ -1,5 +1,6 @@
 'use strict';
 var resolve = require('path').resolve;
+var DEBUG = true;
 
 var BaseWrapper = require('./base');
 
@@ -28,8 +29,6 @@ MicroservWrapper.ERR_MSG2 = "\n\
 
 // public members
 (function(){
-    this.test = function() { console.log('test'); };
-
     /* resolveConfig function does following :-
      *
      * 1. Initializes plugin.wrapper, given the packageRole
@@ -138,50 +137,66 @@ MicroservWrapper.ERR_MSG2 = "\n\
             Object.keys(proto) // wrap exposed functions
             .forEach(function(functionName){
                 if(proto[functionName]) { // is not false
-                    WrapperObj.prototype[functionName] = me.makePluginWrapper(serviceName, functionName);
+                    var fn = me.makePluginWrapper(serviceName, functionName);
+                    if(!fn){
+                        console.log("makePluginWrapper for " + serviceName + "." + functionName + " returned undefined.");
+                    }else{
+                        WrapperObj.prototype[functionName] = fn;
+                    }
                 }
             });
 
             // create an wrapper
             plugin.wrappers[serviceName] = new WrapperObj(plugin, imports);
         });
-        register(null, plugin.wrappers);
+        return register(null, plugin.wrappers);
     };
 
     this.setupPluginServer = function(plugin, imports, register){
         var me = this;
-        Object.keys(plugin.wrappers) // each service
-        .forEach(function(serviceName){
-            // makeHooks
-            var makeHooksFn  = function(theServiceName, theWrapper, theInstance) {
-                return function(){
-                    var proto = (theWrapper.prototype) ? (theWrapper.prototype) : (theWrapper); // is an object or instance?
-                    Object.keys(proto) // wrap exposed functions
-                    .forEach(function(functionName){
-                        if(proto[functionName]) { // is not false
-                            me.makePluginHook(theServiceName, functionName, theInstance);
-                        }
-                     });
-                }
-            };
-            
-            // implementation
-            var serviceInstance;
-            var ServiceObj = plugin.implementations[serviceName];
-            var wrap = plugin.wrappers[serviceName];
-            if (ServiceObj.prototype){ // if this is an object
-                serviceInstance = new ServiceObj(plugin, imports); // make an instance
-            }else{
-                serviceInstance = ServiceObj; // is an instance
-            }
-            plugin.implementations[serviceName] = serviceInstance;
-            makeHooksFn(serviceName, wrap, serviceInstance)(); // make hooks
-        });
+        var err;
 
+        // objects being initialized can throw an error
+        try{
+            Object.keys(plugin.wrappers) // each service
+            .forEach(function(serviceName){
+                // makeHooks
+                var makeHooksFn  = function(theServiceName, theWrapper, theInstance) {
+                    return function(){
+                        var proto = (theWrapper.prototype) ? (theWrapper.prototype) : (theWrapper); // is an object or instance?
+                        Object.keys(proto) // wrap exposed functions
+                        .forEach(function(functionName){
+                            if(proto[functionName]) { // is not false
+                                me.makePluginHook(theServiceName, functionName, theInstance);
+                            }
+                         });
+                    }
+                };
+                
+                // implementation
+                var serviceInstance;
+                var ServiceObj = plugin.implementations[serviceName];
+                var wrap = plugin.wrappers[serviceName];
+                if (ServiceObj.prototype){ // if this is an object
+                    serviceInstance = new ServiceObj(plugin, imports); // make an instance
+                }else{
+                    serviceInstance = ServiceObj; // is an instance
+                }
+                plugin.implementations[serviceName] = serviceInstance;
+                makeHooksFn(serviceName, wrap, serviceInstance)(); // make hooks
+            });
+        } catch(e){
+            err = e;
+        }
+    
         // microservice server plugin does not provide these functions
         // via provides interface, to avoid various entry points into these
         // functions (keeps things simple).
-        register(null, {});
+
+        if(DEBUG)
+            register(err, plugin.implementations); // if we are testing/degugging
+        else
+            register(err, {});
     };
     
     /*
