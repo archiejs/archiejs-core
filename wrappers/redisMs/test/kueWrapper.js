@@ -3,14 +3,14 @@
 var chai = require('chai');
 var expect = chai.expect;
 var should = chai.should();
+var async = require('async');
 
-var Archie = require('./../../../../archiejs');
-
-var ServiceObj = require('./serviceObj'); // object
+var ServiceObj1 = require('./serviceObj1'); // object
+var ServiceObj2 = require('./serviceObj2'); // object
 var ServiceInt = require('./serviceIntf'); // interface
 
-var KueWrapperFactory;
-var kueFactory;
+var KueWrapper = require('./../').KueWrapper;
+var kueWrapper;
 
 // redis config
 var config = {
@@ -21,63 +21,75 @@ var config = {
     }
 };
 
-describe('Kue Redis Wrapper Testcases:', function(){
-
-    beforeEach(function(){
-        kueFactory = new KueWrapperFactory(config);
+describe('Kue Wrapper Testcases:', function(){
+    
+    before(function(){
+        kueWrapper = new KueWrapper();
     });
 
     afterEach(function(){
-        kueFactory.closeClient();
+        kueWrapper.closeClient();
     });
 
-    describe('#creation', function(){
-        it('creates a queue', function(done){
-            var client = kueFactory.getClient();
-            expect(client).to.not.equal(null);
-            done();
-        });
+    it('#makes rpc calls', function(done){
+        // create producer - consumer
+        var config = {
+            packagePath: 'test',
+            provides: {
+                'Obj1': {
+                    implementation: 'serviceObj1',
+                    interface: 'serviceObj1'
+                },
+                'Obj2': 'serviceObj2'
+            }
+        };
+        var configClient = JSON.parse(JSON.stringify(config));
+        var configServer = JSON.parse(JSON.stringify(config));
+        configClient.packageRole = 'client';
+        configServer.packageRole = 'server';
+        
+        async.waterfall([
+            function(cb){
+                // check resolveConfig client
+                kueWrapper.resolveConfig(configClient);
+                configClient.provides.length.should.equal(2);
+                configClient.wrappers.should.have.property('Obj1');
+                configClient.wrappers.should.have.property('Obj2');
+                cb();
+            },
+            function(cb){
+                // check resolveConfig server
+                kueWrapper.resolveConfig(configServer);
+                configServer.provides.length.should.equal(0);
+                cb();
+            },
+            function(cb){
+                // check resolveConfig setupPlugin
+                kueWrapper.setupPlugin(configServer, {}, cb);
+            },
+            function(cb){
+                // check setupPlugin client
+                kueWrapper.setupPlugin(configClient, {}, 
+                    function(err, serviceMap){
+                        if(err) {
+                            throw err;
+                        }
+                        serviceMap.should.have.property('Obj1');
+                        serviceMap.should.have.property('Obj2');
+
+                        serviceMap.Obj1.func1();
+                        serviceMap.Obj1.func2();
+                        serviceMap.Obj1.func3();
+                
+                        expect(serviceMap.func1_count).to.equal(1);
+                        expect(serviceMap.func2_count).to.equal(1);
+                        expect(serviceMap.func3_count).to.equal(1);
+                        cb();
+                    }
+                );
+            }],
+            done
+        );
     });
 
-    describe('#closing', function(){
-        it('closes the redis client and queue', function(done){
-            kueFactory.closeClient(function(err){
-                var client = kueFactory.getClient();
-                expect(err).to.not.equal(null);
-                expect(client).to.equal(null);
-            });
-            done();
-        });
-    });
-
-    describe('#wrapper creation', function(){
-        it('creates a wrapper', function(done){
-            // create producer - consumer
-            var client = kueFactory.makeWrappers(ServiceObj);
-            expect(client.func1).to.not.equal(null);
-            expect(client.func2).to.not.equal(null);
-            expect(client.func3).to.not.equal(null);
-            done();
-        });
-    });
-   
-    describe('#make rpc calls', function(){
-        it('increments call count of functions', function(done){
-            var serviceInst = new ServiceObj();
-            kueFactory.makeHooks(ServiceObj, serviceInst);
-            
-            var client = kueFactory.makeWrappers(ServiceObj);
-            client.func1();
-            client.func2();
-            client.func3();
-    
-            setTimeout(function(){
-                expect(serviceInst.func1_count).to.equal(1);
-                expect(serviceInst.func2_count).to.equal(1);
-                expect(serviceInst.func3_count).to.equal(1);
-                done();
-            },100);
-        });
-    });
-});
-    
+}); 

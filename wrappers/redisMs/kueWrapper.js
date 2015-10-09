@@ -1,10 +1,10 @@
 'use strict';
 var resolve = require('path').resolve;
 
-var MicroserverWrapper = require('./../core/microservice.js');
+var MicroserviceWrapper = require('./../core').MicroserviceWrapper;
 
 var KueWrapper = function(){
-    MicroserverWrapper.call(this);
+    MicroserviceWrapper.call(this);
     this.wrapperName = "kuewrapper";
     this.redisConfig = {};
 
@@ -15,7 +15,7 @@ var KueWrapper = function(){
     });
 };
 
-KueWrapper.extends(MicroserverWrapper);
+KueWrapper.extends(MicroserviceWrapper);
 
 KueWrapper.HELP_MSG = "\
 Your config should have following fields.  \n\
@@ -72,12 +72,12 @@ Your config should have following fields.  \n\
 
         // return a wrapper function that fires the job
         return
-            function(){
+            (function() {
                 // pop data from arguments and make RPC call
                 var _a = this.parseArguments(arguments);
-                var data = p.data;
-                var options = p.options;
-                var cb = p.callback;
+                var data = _a.data;
+                var options = _a.options;
+                var cb = _a.callback;
 
                 // create a job
                 var job = me.jobsClient.create(jobKey, _a.data);
@@ -106,7 +106,7 @@ Your config should have following fields.  \n\
 
                 // return to user to update any options
                 return job;
-            };
+            });
     };
 
     this.makePluginHook = function(serviceName, functionName, serviceInstance){
@@ -114,7 +114,7 @@ Your config should have following fields.  \n\
         var jobKey = serviceName + '.' + functionName;
 
         // create hook
-        me.jobsClient.process( jobKey, function(job, cb){
+        this.jobsClient.process( jobKey, function(job, cb){
             serviceInstance[jobKey] (job.data, cb);
         });
     };
@@ -122,9 +122,3 @@ Your config should have following fields.  \n\
 }).call(KueWrapper.prototype);
 
 module.exports = KueWrapper;
-
-
-
-
-
-

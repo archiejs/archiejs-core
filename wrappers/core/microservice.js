@@ -28,6 +28,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
 
 // public members
 (function(){
+    this.test = function() { console.log('test'); };
 
     /* resolveConfig function does following :-
      *
@@ -93,7 +94,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
                 }
                 tmpPath = resolve(base, modulePath, provide.interface);
                 wrappers[serviceName] = require(tmpPath);
-                
+
                 if (plugin.packageRole !== 'client'){
                     tmpPath = resolve(base, modulePath, provide.implementation);
                     implementations[serviceName] = require(tmpPath);

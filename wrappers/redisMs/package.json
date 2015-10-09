@@ -10,6 +10,7 @@
     "test": "./node_modules/mocha/bin/mocha test"
   },
   "devDependencies": {
+    "async": "^1.4.2",
     "chai": "^3.3.0",
     "mocha": "^2.3.3"
   },

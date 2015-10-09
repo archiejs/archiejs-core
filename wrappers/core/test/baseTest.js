@@ -4,8 +4,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var should = chai.should();
 
-require('./../../../misc.js');
-var BaseWrapper = require('./../base.js');
+var BaseWrapper = require('./../').BaseWrapper;
 var ServiceObj = require('./serviceObj1.js');
 
 var baseWrapper = new BaseWrapper();

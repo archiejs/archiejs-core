@@ -4,8 +4,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var should = chai.should();
 
-require('./../../../misc.js');
-var MicroWrapper = require('./../microservice.js');
+var MicroWrapper = require('./../').MicroserviceWrapper;
 var ServiceObj = require('./serviceObj1.js');
 var ServiceIntf = require('./serviceIntf.js');
 
@@ -30,7 +29,7 @@ DerivedMSWrapper.prototype.makePluginHook = function(serviceName, functionName){
 var microWrapper;
 
 describe('Microservice Wrapper Testcases:', function(){
-    
+
     beforeEach(function(){
         microWrapper = new MicroWrapper();
     });
