@@ -6,7 +6,6 @@ var BaseWrapper = require('./base');
 var MicroservWrapper = function(){
     BaseWrapper.call(this);
     this.wrapperName = "microservice";
-    return this;
 };
 
 MicroservWrapper.extends(BaseWrapper);
