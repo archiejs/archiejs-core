@@ -7,17 +7,39 @@ var should = chai.should();
 require('./../../../misc.js');
 var MicroWrapper = require('./../microservice.js');
 var ServiceObj = require('./serviceObj1.js');
+var ServiceIntf = require('./serviceIntf.js');
 
-var microWrapper = new MicroWrapper();
+/*
+ * Derived Microservice Wrapper
+ */
+var DerivedMSWrapper = function(){
+    MicroWrapper.call(this);
+};
+DerivedMSWrapper.extends(MicroWrapper);
+DerivedMSWrapper.prototype.makePluginWrapper = function(serviceName, functionName){
+    var key = serviceName + "." + functionName;
+    return function() { return key; };
+};
+DerivedMSWrapper.prototype.makePluginHook = function(serviceName, functionName){
+    var key = serviceName + "." + functionName;
+    return function() { return key; };
+};
+/*** end ***/
+
+var microWrapper;
 
 describe('Microservice Wrapper Testcases:', function(){
+    
+    beforeEach(function(){
+        microWrapper = new MicroWrapper();
+    });
 
-    it('wrapper has a name', function(done){
+    it('tests that wrapper has a name', function(done){
         microWrapper.wrapperName.should.equal('microservice');
         done();
     });
 
-    it('test resolveConfig with null values', function(done){
+    it('tests resolveConfig with null values', function(done){
         var config = {
             packagePath: 'test',
             consumes: null,
@@ -29,7 +51,7 @@ describe('Microservice Wrapper Testcases:', function(){
         done();
     });
 
-    it('test resolveConfig with `default` packageRole - test1', function(done){
+    it('tests resolveConfig with default package - tests1', function(done){
         var config = {
             packagePath: 'test',
             provides: {
@@ -42,12 +64,12 @@ describe('Microservice Wrapper Testcases:', function(){
         };
         microWrapper.resolveConfig(config);
         config.provides.length.should.equal(2);
-        config.interfaces.should.have.property('Obj1');
-        config.interfaces.should.have.property('Obj2');
+        config.wrappers.should.have.property('Obj1');
+        config.wrappers.should.have.property('Obj2');
         done();
     });
     
-    it('test resolveConfig with `client` packageRole', function(done){
+    it('tests resolveConfig for client package', function(done){
         var config = {
             packageRole: 'client',
             packagePath: 'test',
@@ -61,12 +83,12 @@ describe('Microservice Wrapper Testcases:', function(){
         };
         microWrapper.resolveConfig(config);
         config.provides.length.should.equal(2);
-        config.interfaces.should.have.property('Obj1');
-        config.interfaces.should.have.property('Obj2');
+        config.wrappers.should.have.property('Obj1');
+        config.wrappers.should.have.property('Obj2');
         done();
     }); 
     
-    it('test resolveConfig with `server` packageRole', function(done){
+    it('tests resolveConfig with `server` packageRole', function(done){
         var config = {
             packageRole: 'server',
             packagePath: 'test',
@@ -80,12 +102,12 @@ describe('Microservice Wrapper Testcases:', function(){
         };
         microWrapper.resolveConfig(config);
         config.provides.length.should.equal(0);
-        config.interfaces.should.have.property('Obj1');
-        config.interfaces.should.have.property('Obj2');
+        config.wrappers.should.have.property('Obj1');
+        config.wrappers.should.have.property('Obj2');
         done();
     }); 
 
-    it('test setupPlugin for default packageRole', function(done){
+    it('tests setupPlugin for default package', function(done){
         var config = {
             packagePath: 'test',
             provides: {
@@ -109,6 +131,66 @@ describe('Microservice Wrapper Testcases:', function(){
                 done();
             }
         );
+    });
+
+    describe('tests setupPlugin for client-server function', function(){
+
+        beforeEach(function(){
+            microWrapper = new DerivedMSWrapper();
+        });
+
+        it('tests setupPlugin for client package', function(done){
+            var config = {
+                packagePath: 'test',
+                packageRole: 'client',
+                provides: {
+                    'Obj1': {
+                        implementation: 'serviceObj1',
+                        interface: 'serviceIntf'
+                    }
+                }
+            };
+            microWrapper.resolveConfig(config);
+            microWrapper.setupPlugin(config, {},
+                function(err, serviceMap){
+                    if(err){
+                        throw err;
+                    }
+                    var client = serviceMap.Obj1;
+                    client.func1().should.equal('Obj1.func1');
+                    client.func2().should.equal('Obj2.func2');
+                    client.func3().should.equal('Obj3.func3');
+                    done();
+                }
+            );
+        });
+        
+        it('tests setupPlugin for server package', function(done){
+            var config = {
+                packagePath: 'test',
+                packageRole: 'server',
+                provides: {
+                    'Obj1': {
+                        implementation: 'serviceObj1',
+                        interface: 'serviceIntf'
+                    }
+                }
+            };
+            microWrapper.resolveConfig(config);
+            microWrapper.setupPlugin(config, {},
+                function(err, serviceMap){
+                    if(err){
+                        throw err;
+                    }
+                    var server = serviceMap.Obj1;
+                    server.func1().should.equal('Obj1.func1');
+                    server.func2().should.equal('Obj2.func2');
+                    server.func3().should.equal('Obj3.func3');
+                    done();
+                }
+            );
+        });
+
     });
 
 });

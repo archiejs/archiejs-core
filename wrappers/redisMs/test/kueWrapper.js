@@ -5,7 +5,9 @@ var expect = chai.expect;
 var should = chai.should();
 
 var Archie = require('./../../../../archiejs');
-var ServiceObj = require('./serviceObj');
+
+var ServiceObj = require('./serviceObj'); // object
+var ServiceInt = require('./serviceIntf'); // interface
 
 var KueWrapperFactory;
 var kueFactory;
@@ -20,21 +22,6 @@ var config = {
 };
 
 describe('Kue Redis Wrapper Testcases:', function(){
-
-    // create an Archie app
-
-    before(function(){
-        var tree = Archie.resolveConfig(
-        [{
-            packagePath: '../'
-        }], __dirname);
-
-        Archie.createApp(tree, function(err, app){
-            if(err)
-                return console.log(err);
-            KueWrapperFactory = app.getService("kueMicroserviceWrapper");
-        });
-    });
 
     beforeEach(function(){
         kueFactory = new KueWrapperFactory(config);

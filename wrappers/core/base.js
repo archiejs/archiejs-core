@@ -49,7 +49,7 @@ var BaseWrapper = function(){
             serviceMap[serviceName] = require(servicePath);
         }
 
-        plugin.interfaces = serviceMap;
+        plugin.wrappers = serviceMap;
         plugin.provides = provides;
     };
 
@@ -69,12 +69,12 @@ var BaseWrapper = function(){
      */
 
     this.setupPlugin = function(plugin, imports, register){
-        // this function registers the interfaces
-        var registerInterfaces = function(err, _serviceInstances){
-            if(plugin.interfaces) {
+        // this function registers the wrappers
+        var registerWrappers = function(err, _serviceInstances){
+            if(plugin.wrappers) {
                 try {
-                    for(var serviceName in plugin.interfaces){
-                        var instance = new plugin.interfaces[serviceName](plugin, imports, register);
+                    for(var serviceName in plugin.wrappers){
+                        var instance = new plugin.wrappers[serviceName](plugin, imports, register);
                         _serviceInstances[serviceName] = instance;
                     }
                 }catch(err){
@@ -85,10 +85,10 @@ var BaseWrapper = function(){
         }
 
         if(plugin.setup){
-            // no interfaces are provided
-            return plugin.setup.call(plugin, imports, registerInterfaces);
+            // no wrappers are provided
+            return plugin.setup.call(plugin, imports, registerWrappers);
         }else{
-            return registerInterfaces(null, {});
+            return registerWrappers(null, {});
         }
     };
 

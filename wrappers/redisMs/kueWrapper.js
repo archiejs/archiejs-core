@@ -109,13 +109,13 @@ Your config should have following fields.  \n\
             };
     };
 
-    this.makePluginHook = function(serviceName, functionName){
+    this.makePluginHook = function(serviceName, functionName, serviceInstance){
         // unique service name
         var jobKey = serviceName + '.' + functionName;
 
         // create hook
         me.jobsClient.process( jobKey, function(job, cb){
-            instance[property] (job.data, cb);
+            serviceInstance[jobKey] (job.data, cb);
         });
     };
 

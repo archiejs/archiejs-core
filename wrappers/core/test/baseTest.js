@@ -54,8 +54,8 @@ describe('Base Wrapper Testcases:', function(){
         baseWrapper.resolveConfig(config);
 
         config.provides.length.should.equal(2);
-        config.interfaces.should.have.property('Obj1');
-        config.interfaces.should.have.property('Obj2');
+        config.wrappers.should.have.property('Obj1');
+        config.wrappers.should.have.property('Obj2');
         done();
     });
 
