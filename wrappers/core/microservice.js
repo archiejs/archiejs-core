@@ -172,7 +172,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
                          });
                     }
                 };
-                
+
                 // implementation
                 var serviceInstance;
                 var ServiceObj = plugin.implementations[serviceName];

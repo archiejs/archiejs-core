@@ -3,6 +3,8 @@
 var events = require('events');
 var EventEmitter = events.EventEmitter;
 
+var wrapper = require('./wrappers');
+
 var exports = {};
 
 // Only define Node-style usage using sync I/O if in node.
@@ -54,15 +56,8 @@ var exports = {};
                 // if no, don't load setup function, etc and create hooks
                 plugin.packagePath = defaults.packagePath; // now has the file to load
                 plugin.setup = require(plugin.packagePath);
-                
-                // if the plugin uses package wrappers
-                if (plugin.hasOwnProperty("packageWrapper")){
-                    var wrapperDefaults = resolveWrappedServices(base, plugin);
-                    plugin.packageWrapper = wrapperDefaults.packageWrapper;
-                    plugin.packageRole = wrapperDefaults.packageRole;
-                    plugin.wrapperSetups = wrapperDefauls.setups;
-                    plugin.provides = wrapperDefaults.provides;
-                }
+
+                resolveWrappedServicesSync(base, plugin);
             }
         });
         return config;
@@ -97,15 +92,9 @@ var exports = {};
                     } catch(e) {
                         return callback(e);
                     }
-                
+
                     // if the plugin uses package wrappers
-                    if (plugin.hasOwnProperty("packageWrapper")){
-                        var wrapperDefaults = resolveWrappedServices(base, plugin);
-                        plugin.packageWrapper = wrapperDefaults.packageWrapper;
-                        plugin.packageRole = wrapperDefaults.packageRole;
-                        plugin.wrapperSetups = wrapperDefauls.setups;
-                        plugin.provides = wrapperDefaults.provides;
-                    }
+                    resolveWrappedServicesSync(base, plugin);
 
                     return resolveNext(++i);
                 });
@@ -284,10 +273,15 @@ var exports = {};
     }
 
     // Load all objects that are provided by the module (they will be consumed by wrapper)
-    function resolveWrappedServices(base, plugin){
-        var packageWrapperInst = archieWrappers[plugin.packageWrapper];
-        packageWrapperInst.resolveConfig(base, plugin);
-        plugin.packageWrapper = packageWrapperInst;
+    function resolveWrappedServicesSync(base, plugin){
+        var wrapper;
+        if(plugin.packageWrapper){
+            wrapper = wrapper.getWrapper(plugin.packageWrapper);
+        }else{
+            wrapper = wrapper.default;
+        }
+        wrapper.resolveConfig(plugin, base);
+        plugin.packageWrapper = wrapper;
     }
 }());
 
@@ -473,7 +467,8 @@ Archie.prototype.registerPlugin = function(plugin, next) {
     }
 
     try {
-        plugin.setup(plugin, imports, register);
+        // this should be called from the wrapper
+        plugin.packageWrapper.setupPlugin(plugin, imports, register);
     } catch(e) {
         return app.emit("error", e);
     }

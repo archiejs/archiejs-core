@@ -1,0 +1,11 @@
+{
+  "name": "wrappers",
+  "version": "1.0.0",
+  "description": "lists all archie wrappers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Naval Saini <navalnovel@gmail.com> (http://www.flipflopapp.com/)",
+  "license": "ISC"
+}

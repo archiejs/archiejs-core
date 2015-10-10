@@ -72,13 +72,9 @@ var BaseWrapper = function(){
         // this function registers the wrappers
         var registerWrappers = function(err, _serviceInstances){
             if(plugin.wrappers) {
-                try {
-                    for(var serviceName in plugin.wrappers){
-                        var instance = new plugin.wrappers[serviceName](plugin, imports, register);
-                        _serviceInstances[serviceName] = instance;
-                    }
-                }catch(err){
-                    return register(err);
+                for(var serviceName in plugin.wrappers){
+                    var instance = new plugin.wrappers[serviceName](plugin, imports, register);
+                    _serviceInstances[serviceName] = instance;
                 }
             }
             return register(null, _serviceInstances);
