@@ -63,9 +63,6 @@ MicroservWrapper.ERR_MSG2 = "\n\
             return;
         }
 
-        if(!base)
-            base = __dirname;
-
         var provides = Object.keys(plugin.provides);
         var modulePath = plugin.packagePath;
         var wrappers = {};
@@ -73,6 +70,9 @@ MicroservWrapper.ERR_MSG2 = "\n\
         var provide;
         var tmpPath;
         var tmpObj;
+
+        if(!base)
+            base = __dirname;
 
         // parse the wrappers
 

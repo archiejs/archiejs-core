@@ -55,9 +55,12 @@ var exports = {};
 
                 // if no, don't load setup function, etc and create hooks
                 plugin.packagePath = defaults.packagePath; // now has the file to load
-                
-                if(plugin.packagePath)
+
+                // not all packages have a main entry point
+                // in which case require fails.
+                try{
                     plugin.setup = require(plugin.packagePath);
+                } catch(e){}
 
                 resolveWrappedServicesSync(base, plugin);
             }
@@ -131,8 +134,8 @@ var exports = {};
             var module = require(modulePath);
             metadata.provides = metadata.provides || module.provides || [];
             metadata.consumes = metadata.consumes || module.consumes || [];
-            metadata.packagePath = modulePath;
         }
+        metadata.packagePath = modulePath;
         return metadata;
     }
 
@@ -280,14 +283,12 @@ var exports = {};
 
     // Load all objects that are provided by the module (they will be consumed by wrapper)
     function resolveWrappedServicesSync(base, plugin){
-        var wrapper;
-        if(plugin.packageWrapper){
-            wrapper = new Wrappers.getWrapper(plugin.packageWrapper)();
-        }else{
-            wrapper = new Wrappers.default();
+        if(!plugin.packageWrapper){
+            plugin.packageWrapper = Wrappers.defaultWrapperName;
         }
-        wrapper.resolveConfig(plugin, base);
-        plugin.packageWrapper = wrapper;
+        var wrapperInst = Wrappers.newWrapper(plugin.packageWrapper);
+        wrapperInst.resolveConfig(plugin, base);
+        plugin.packageWrapper = wrapperInst;
     }
 }());
 
@@ -300,9 +301,10 @@ function checkConfig(config) {
     // Check for the required fields in each plugin.
     config.forEach(function (plugin) {
         if (plugin.checked) { return; }
-        if (!plugin.hasOwnProperty("setup")) {
-            throw new Error("Plugin is missing the setup function " + JSON.stringify(plugin));
-        }
+        // legacy: not all packages have setup functions
+        //if (!plugin.hasOwnProperty("setup")) {
+        //    throw new Error("Plugin is missing the setup function " + JSON.stringify(plugin));
+        //}
         if (!plugin.hasOwnProperty("provides")) {
             throw new Error("Plugin is missing the provides array " + JSON.stringify(plugin));
         }

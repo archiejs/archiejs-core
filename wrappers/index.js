@@ -3,28 +3,40 @@ var DEBUG = false;
 var core = require('./core');
 var redis = require('./redisMs');
 
-archieWrapper = {
-    "core": core.BaseWrapper,
-    "microservice": core.BaseWrapper,
-    "database": core.DbWrapper,
-    "kue": redis.KueWrapper
+wrapperFactory = {
+    "core": function() {
+        return new core.BaseWrapper();
+    },
+    "microservice": function() {
+        return new core.BaseWrapper();
+    },
+    "database": function() {
+        return new core.DbWrapper();
+    },
+    "kue": function() {
+        return new redis.KueWrapper();
+    }
 };
 
-module.exports.default = core.BaseWrapper;
+module.exports.defaultWrapperName = "core";
 
-module.exports.registerWrapper = function(path, name){
+module.exports.registerWrapperFactory = function(path, name, factory){
     if(!name)
         name = path.wrapperName;
 
-    if(archieWrapper[name]){
+    if(wrapperFactory[name]){
         console.log("WARNING! You are overwriting a wrapper that is already registered with Archie module");
         console.log("  Wrapper Name : " + name);
         if(DEBUG) console.trace();
     }
 
-    archieWrapper = require(path);
+    wrapperFactory = require(path);
 };
 
-module.exports.getWrapper = function(name){
-    return archieWrapper[name];
+module.exports.newWrapper = function(name){
+    if(wrapperFactory[name]){
+        return wrapperFactory[name]();
+    }else{
+        console.log("WARINING! Unable to create " + name + " wrapper - it is not registered.");
+    }
 };
