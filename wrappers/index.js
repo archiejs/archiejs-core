@@ -1,7 +1,7 @@
 var DEBUG = false;
 
 var core = require('./core');
-var redis = require('./redis');
+var redis = require('./redisMs');
 
 archieWrapper = {
     "core": core.BaseWrapper,
@@ -17,7 +17,7 @@ module.exports.registerWrapper = function(path, name){
         name = path.wrapperName;
 
     if(archieWrapper[name]){
-        console.log("WARNING! You are overwriting a wrapper that is already registered with Archie module');
+        console.log("WARNING! You are overwriting a wrapper that is already registered with Archie module");
         console.log("  Wrapper Name : " + name);
         if(DEBUG) console.trace();
     }

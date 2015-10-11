@@ -3,7 +3,7 @@
 var events = require('events');
 var EventEmitter = events.EventEmitter;
 
-var wrapper = require('./wrappers');
+var Wrappers = require('./wrappers');
 
 var exports = {};
 
@@ -55,7 +55,9 @@ var exports = {};
 
                 // if no, don't load setup function, etc and create hooks
                 plugin.packagePath = defaults.packagePath; // now has the file to load
-                plugin.setup = require(plugin.packagePath);
+                
+                if(plugin.packagePath)
+                    plugin.setup = require(plugin.packagePath);
 
                 resolveWrappedServicesSync(base, plugin);
             }
@@ -117,16 +119,20 @@ var exports = {};
         catch (err) {
             if (err.code !== "ENOENT") throw err;
         }
-        var metadata = packagePath && require(packagePath).plugin || {};
+        var packageJson = packagePath && require(packagePath) || {};
+        var metadata = packagePath && packageJson.plugin || {};
         if (packagePath) {
             modulePath = dirname(packagePath);
         } else {
             modulePath = resolvePackageSync(base, modulePath);
         }
-        var module = require(modulePath);
-        metadata.provides = metadata.provides || module.provides || [];
-        metadata.consumes = metadata.consumes || module.consumes || [];
-        metadata.packagePath = modulePath;
+        // pacakgeJson - may not have a main entry point
+        if(packageJson.main){
+            var module = require(modulePath);
+            metadata.provides = metadata.provides || module.provides || [];
+            metadata.consumes = metadata.consumes || module.consumes || [];
+            metadata.packagePath = modulePath;
+        }
         return metadata;
     }
 
@@ -276,9 +282,9 @@ var exports = {};
     function resolveWrappedServicesSync(base, plugin){
         var wrapper;
         if(plugin.packageWrapper){
-            wrapper = wrapper.getWrapper(plugin.packageWrapper);
+            wrapper = new Wrappers.getWrapper(plugin.packageWrapper)();
         }else{
-            wrapper = wrapper.default;
+            wrapper = new Wrappers.default();
         }
         wrapper.resolveConfig(plugin, base);
         plugin.packageWrapper = wrapper;
