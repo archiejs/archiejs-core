@@ -1,20 +1,22 @@
 var ServiceObj = function(){
-    this.func1_count = 0;
-    this.func2_count = 0;
-    this.func3_count = 0;
+    this.value = 0;
+    this.comments = [];
 };
 
 (function(){
-    this.func1 = function(){
-        this.func1_count++;
+    this.add = function(num, str){
+        this.value += num ;
+        this.commend.push(str);
     };
 
-    this.func2 = function(){
-        this.func2_count++;
+    this.sub = function(num, str){
+        this.value -= num ;
+        this.commend.push(str);
     };
     
-    this.func3 = function(){
-        this.func3_count++;
+    this.mult = function(num, str){
+        this.value += num ;
+        this.commend.push(str);
     };
 }).call(ServiceObj.prototype);
 

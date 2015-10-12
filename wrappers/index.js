@@ -25,8 +25,8 @@ module.exports.registerWrapperFactory = function(path, name, factory){
         name = path.wrapperName;
 
     if(wrapperFactory[name]){
-        console.log("WARNING! You are overwriting a wrapper that is already registered with Archie module");
-        console.log("  Wrapper Name : " + name);
+        console.warn("WARNING! You are overwriting a wrapper that is already registered with Archie module");
+        console.warn("  Wrapper Name : " + name);
         if(DEBUG) console.trace();
     }
 
@@ -37,6 +37,6 @@ module.exports.newWrapper = function(name){
     if(wrapperFactory[name]){
         return wrapperFactory[name]();
     }else{
-        console.log("WARINING! Unable to create " + name + " wrapper - it is not registered.");
+        console.warn("WARINING! Unable to create " + name + " wrapper - it is not registered.");
     }
 };

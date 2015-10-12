@@ -42,6 +42,9 @@ MicroservWrapper.ERR_MSG2 = "\n\
      */
 
     this.resolveConfig = function(plugin, base){
+        if(!base) {
+            throw new Error("base path must be provided in arguments");
+        }
         if(plugin.packageRole && !(plugin.packageRole === 'client' || plugin.packageRole === 'server'
                 || plugin.packageRole === 'default')) {
             throw new Error(MicroservWrapper.ERR_MSG1);
@@ -59,7 +62,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
 
         if(!plugin.provides){
             plugin.provides = [];
-            console.log(MicroservWrapper.ERR_MSG2);
+            console.warn(MicroservWrapper.ERR_MSG2);
             return;
         }
 
@@ -71,9 +74,6 @@ MicroservWrapper.ERR_MSG2 = "\n\
         var tmpPath;
         var tmpObj;
 
-        if(!base)
-            base = __dirname;
-
         // parse the wrappers
 
         for(var serviceName in plugin.provides){
@@ -81,14 +81,15 @@ MicroservWrapper.ERR_MSG2 = "\n\
             if(typeof provide === 'string'){ // file
                 tmpPath = resolve(base, modulePath, provide);
                 tmpObj = require(tmpPath);
+
                 wrappers[serviceName] = tmpObj;
                 if (plugin.packageRole !== 'client'){
                     implementations[serviceName] = tmpObj;
                 }
             } else {
                 if(typeof provide !== 'object' || provide.implementations === null || provide.interface === null){
-                    console.log("Skipping " + serviceName);
-                    console.log("...Please provide the implementation and interface files properly.");
+                    console.warn("Skipping " + serviceName);
+                    console.warn("...Please provide the implementation and interface files properly.");
                     continue; // skip
                 }
                 tmpPath = resolve(base, modulePath, provide.interface);
@@ -97,6 +98,11 @@ MicroservWrapper.ERR_MSG2 = "\n\
                 if (plugin.packageRole !== 'client'){
                     tmpPath = resolve(base, modulePath, provide.implementation);
                     implementations[serviceName] = require(tmpPath);
+
+                    // check for user mistake.
+                    if( JSON.stringify(implementations[serviceName]) === "{}" ){
+                        console.warn("Warning! looks like '" + serviceName + "' does not export any objects.");
+                    }
                 }
             }
         }
@@ -113,7 +119,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
         plugin.wrappers = wrappers;
         plugin.implementations = implementations;
     };
-    
+
     this.setupPlugin = function(plugin, imports, register){
         if(plugin.packageRole === 'client'){
             this.setupPluginClient(plugin, imports, register);
@@ -139,7 +145,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
                 if(proto[functionName]) { // is not false
                     var fn = me.makePluginWrapper(serviceName, functionName);
                     if(!fn){
-                        console.log("makePluginWrapper for " + serviceName + "." + functionName + " returned undefined.");
+                        console.warn("makePluginWrapper for " + serviceName + "." + functionName + " returned undefined.");
                     }else{
                         WrapperObj.prototype[functionName] = fn;
                     }
@@ -161,7 +167,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
             Object.keys(plugin.wrappers) // each service
             .forEach(function(serviceName){
                 // makeHooks
-                var makeHooksFn  = function(theServiceName, theWrapper, theInstance) {
+                var makeHooksFn = function(theServiceName, theWrapper, theInstance) {
                     return function(){
                         var proto = (theWrapper.prototype) ? (theWrapper.prototype) : (theWrapper); // is an object or instance?
                         Object.keys(proto) // wrap exposed functions
@@ -188,7 +194,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
         } catch(e){
             err = e;
         }
-    
+
         // microservice server plugin does not provide these functions
         // via provides interface, to avoid various entry points into these
         // functions (keeps things simple).
@@ -223,54 +229,95 @@ MicroservWrapper.ERR_MSG2 = "\n\
         throw new Error("override");
     };
 
-    /* Misc functions
+    /* Helper functions
      */
 
-    this.parseArgumentsArray = function(){
-        // get all keys in arguments, etc
-        var data = {};
-        var keys = [];
-        for(var key in arguments) {
-            data[key] = arguments[key];
-            keys.push(key);
-        }
-        var optionIdx = keys.pop();
-        var cbIdx = keys.pop();
+    // We will need to often convert formats of data while making RPC calls
+    // into queues. These helper functions make the task easier.
+    //
+    // The arguments are converted from an array of format:-
+    //
+    //      service.func(arg1, arg2, callback, options);
+    //
+    // Into a json of following format:-
+    //
+    //      {
+    //          data: {
+    //              0: arg1,
+    //              1: arg2
+    //          },
+    //          callback: function,
+    //          option: optional json (has special attributes)
+    //      }
+    //
 
-        // parse arguments
-        var cb;
-        var options = arguments[optionIdx];
-        if (typeof(options) == 'function') {
-            cb = options;
+    this.parseArguments = function(_args){
+        // max index (callback is either the last or second last element)
+        var max=-1;
+        var idx=-1;
+        for(var key in _args){
+            idx = Number(key);
+            if(!isNaN(idx) && idx > max){
+                max = idx;
+            }
+        }
+
+        if ( max < 0 ) {
+            throw new Error("no callback provided");
+        }
+        
+        // get callback and options from the last places in argument array
+        var callback;
+        var options = _args[max];
+        --max;
+        if (typeof(options) === 'function') { // this is callback
+            callback = options;
             options = {};
-            delete data[optionIdx];
         } else {
-            cb = arguments[cbIdx];
-            if (typeof(cb) != 'function') {
-                cb = function() {}; // does nothing
-            }else{
-                delete data[cbIdx];
+            if ( max < 0 ) {
+                throw new Error("no callback provided");
+            }
+            callback = _args[max];
+            if( typeof(callback) !== 'function') {
+                throw new Error("no callback provided");
+            }
+            --max;
+        }
+
+        // copy keys into data
+        var data = {};
+        for(var key in _args){
+            idx = Number(key);
+            if(key <= max){
+                data[key] = _args[key];
             }
         }
 
         // return values
         return {
             data: data,
-            options: options,
-            callback: cb
+            callback: callback,
+            options: options
         };
     };
 
-    this.createArgumentsArray = function(data, cb){
-        if(!data) {
+    this.createArguments = function(data, cb){
+        if(!cb){
+            return;
+        }
+        if(!data){
             data = {};
         }
-        var results = [];
+        var max=-1;
+        var idx;
         for(var key in data){
-            results.push(data[key]);
+            idx = Number(key);
+            if(idx && idx > max){
+                max = idx;
+            }
         }
-        results.push(cb);
-        return results;
+        max++;
+        data[max] = cb;
     };
 
 }).call(MicroservWrapper.prototype);

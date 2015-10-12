@@ -3,6 +3,8 @@
 var chai = require('chai');
 var expect = chai.expect;
 var should = chai.should();
+var resolve = require('path').resolve;
+var basedir = resolve(__dirname, '..');
 
 var MicroWrapper = require('./../').MicroserviceWrapper;
 var ServiceObj = require('./serviceObj1.js');
@@ -45,7 +47,7 @@ describe('Microservice Wrapper Testcases:', function(){
             consumes: null,
             provides: null
         };
-        microWrapper.resolveConfig(config);
+        microWrapper.resolveConfig(config, basedir);
         config.consumes.length.should.equal(0);
         config.provides.length.should.equal(0);
         done();
@@ -62,7 +64,7 @@ describe('Microservice Wrapper Testcases:', function(){
                 'Obj2': 'serviceObj2'
             }
         };
-        microWrapper.resolveConfig(config);
+        microWrapper.resolveConfig(config, basedir);
         config.provides.length.should.equal(2);
         config.wrappers.should.have.property('Obj1');
         config.wrappers.should.have.property('Obj2');
@@ -81,7 +83,7 @@ describe('Microservice Wrapper Testcases:', function(){
                 'Obj2': 'serviceObj2'
             }
         };
-        microWrapper.resolveConfig(config);
+        microWrapper.resolveConfig(config, basedir);
         config.provides.length.should.equal(2);
         config.wrappers.should.have.property('Obj1');
         config.wrappers.should.have.property('Obj2');
@@ -100,7 +102,7 @@ describe('Microservice Wrapper Testcases:', function(){
                 'Obj2': 'serviceObj2'
             }
         };
-        microWrapper.resolveConfig(config);
+        microWrapper.resolveConfig(config, basedir);
         config.provides.length.should.equal(0);
         config.wrappers.should.have.property('Obj1');
         config.wrappers.should.have.property('Obj2');
@@ -118,7 +120,7 @@ describe('Microservice Wrapper Testcases:', function(){
                 'Obj2': 'serviceObj2'
             }
         };
-        microWrapper.resolveConfig(config);
+        microWrapper.resolveConfig(config, basedir);
         microWrapper.setupPlugin(config, {}, 
             function(err, serviceMap){
                 if(err) {
@@ -150,16 +152,16 @@ describe('Microservice Wrapper Testcases:', function(){
                     }
                 }
             };
-            microWrapper.resolveConfig(config);
+            microWrapper.resolveConfig(config, basedir);
             microWrapper.setupPlugin(config, {},
                 function(err, serviceMap){
                     if(err){
                         throw err;
                     }
                     var client = serviceMap.Obj1;
-                    client.func1().should.equal('Obj1.func1');
-                    client.func2().should.equal('Obj1.func2');
-                    client.func3().should.equal('Obj1.func3');
+                    client.add().should.equal('Obj1.add');
+                    client.sub().should.equal('Obj1.sub');
+                    client.mult().should.equal('Obj1.mult');
                     done();
                 }
             );
@@ -176,16 +178,16 @@ describe('Microservice Wrapper Testcases:', function(){
                     }
                 }
             };
-            microWrapper.resolveConfig(config);
+            microWrapper.resolveConfig(config, basedir);
             microWrapper.setupPlugin(config, {},
                 function(err){
                     if(err){
                         throw err;
                     }
                     microWrapper.keys.should.have.length(3);
-                    microWrapper.keys.should.contain('Obj1.func1');
-                    microWrapper.keys.should.contain('Obj1.func2');
-                    microWrapper.keys.should.contain('Obj1.func3');
+                    microWrapper.keys.should.contain('Obj1.add');
+                    microWrapper.keys.should.contain('Obj1.sub');
+                    microWrapper.keys.should.contain('Obj1.mult');
                     done();
                 }
             );
@@ -193,4 +195,48 @@ describe('Microservice Wrapper Testcases:', function(){
 
     });
 
+    it('tests parseArgument helper function', function(done){
+        var args = {
+            "0": 10,
+            "1": {
+                "fast": "ball",
+                "cricket": "bat"
+            },
+            "2": function(){
+                return "callback";
+            },
+            "3": {
+                "options": true
+            }
+        };
+
+        var result = microWrapper.parseArguments(args);
+        var data = result.data;
+        var callback = result.callback
+        var options = result.options;
+
+        data[0].should.equal(10);
+        data[1].fast.should.equal("ball");
+        data[1].cricket.should.equal("bat");
+        callback().should.equal("callback");
+        options.options.should.equal(true);
+        done();
+    });
+
+    it('tests createArguments helper function', function(done){
+        var argsJson = {
+            "0": 10,
+            "1": {
+                "fast": "ball",
+                "cricket": "bat"
+            }
+        };
+        var callback = function(){
+            return "callback";
+        };
+
+        microWrapper.createArguments(argsJson, callback);
+        argsJson[2]().should.equal("callback");
+        done();
+    });
 });

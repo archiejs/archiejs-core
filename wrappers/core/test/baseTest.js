@@ -3,6 +3,8 @@
 var chai = require('chai');
 var expect = chai.expect;
 var should = chai.should();
+var resolve = require('path').resolve;
+var basedir = resolve(__dirname, '..');
 
 var BaseWrapper = require('./../').BaseWrapper;
 var ServiceObj = require('./serviceObj1.js');
@@ -22,7 +24,7 @@ describe('Base Wrapper Testcases:', function(){
             provides: 'something',
             consumes: 'something'
         };
-        baseWrapper.resolveConfig(config);
+        baseWrapper.resolveConfig(config, basedir);
         Array.isArray(config.consumes).should.equal(true);
         Array.isArray(config.provides).should.equal(true);
         config.consumes[0].should.equal('something');
@@ -36,7 +38,7 @@ describe('Base Wrapper Testcases:', function(){
             consumes: null,
             provides: null
         };
-        baseWrapper.resolveConfig(config);
+        baseWrapper.resolveConfig(config, basedir);
         config.consumes.length.should.equal(0);
         config.provides.length.should.equal(0);
         done();
@@ -50,7 +52,7 @@ describe('Base Wrapper Testcases:', function(){
                 'Obj2': 'serviceObj2'
             }
         };
-        baseWrapper.resolveConfig(config);
+        baseWrapper.resolveConfig(config, basedir);
 
         config.provides.length.should.equal(2);
         config.wrappers.should.have.property('Obj1');
@@ -66,7 +68,7 @@ describe('Base Wrapper Testcases:', function(){
                 'Obj2': 'serviceObj2'
             }
         };
-        baseWrapper.resolveConfig(config);
+        baseWrapper.resolveConfig(config, basedir);
         baseWrapper.setupPlugin(config, {}, 
             function(err, serviceMap){
                 if(err) {

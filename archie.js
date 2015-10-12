@@ -45,7 +45,8 @@ var exports = {};
             }
 
             // The plugin is a package on the disk.  We need to load it.
-            if (plugin.hasOwnProperty("packagePath") && !plugin.hasOwnProperty("setup")) {
+            if (plugin.hasOwnProperty("packagePath") 
+                  && !(plugin.hasOwnProperty("setup") || plugin.hasOwnProperty("provides"))) {
                 var defaults = resolveModuleSync(base, plugin.packagePath);
                 Object.keys(defaults).forEach(function (key) {
                     if (!plugin.hasOwnProperty(key)) {
@@ -82,7 +83,8 @@ var exports = {};
             }
 
             // The plugin is a package on the disk.  We need to load it.
-            if (plugin.hasOwnProperty("packagePath") && !plugin.hasOwnProperty("setup")) {
+            if (plugin.hasOwnProperty("packagePath") 
+                  && !(plugin.hasOwnProperty("setup") || plugin.hasOwnProperty("provides"))) {
                 resolveModuleAsync(base, plugin.packagePath, function(err, defaults) {
                     if (err) return callback(err);
 

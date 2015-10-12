@@ -16,9 +16,10 @@ var BaseWrapper = function(){
      */
 
     this.resolveConfig = function(plugin, base){
-        if(!base)
-            base = __dirname;
-
+        if(!base) {
+            throw new Error("base should be provided in arguments (use __dirname)");
+        }
+        
         if(!plugin.packagePath) 
             throw new Error('packagePath missing in plugin');
 
@@ -82,7 +83,7 @@ var BaseWrapper = function(){
 
         if(plugin.setup){
             // no wrappers are provided
-            return plugin.setup.call(plugin, imports, registerWrappers);
+            return plugin.setup(plugin, imports, registerWrappers);
         }else{
             return registerWrappers(null, {});
         }
