@@ -1,3 +1,4 @@
+
 var ServiceObj = function(){
     this.func1_count = 0;
     this.func2_count = 0;
@@ -11,12 +12,12 @@ var ServiceObj = function(){
     };
 
     this.func2 = function(done){
-        this.func2_count++;
+        this.func2_count = 1;
         done();
     };
-    
+
     this.func3 = function(done){
-        this.func3_count++;
+        this.func3_count = 1;
         done();
     };
 }).call(ServiceObj.prototype);

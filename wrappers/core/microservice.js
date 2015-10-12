@@ -251,7 +251,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
     //      }
     //
 
-    this.parseArguments = function(_args){
+    this.parseServiceArgs = function(_args){
         // max index (callback is either the last or second last element)
         var max=-1;
         var idx=-1;
@@ -300,24 +300,16 @@ MicroservWrapper.ERR_MSG2 = "\n\
             options: options
         };
     };
-
-    this.createArguments = function(data, cb){
-        if(!cb){
-            return;
-        }
-        if(!data){
-            data = {};
-        }
-        var max=-1;
-        var idx;
+    
+    this.createServiceArgs = function(data, cb){
+        var results = [];
         for(var key in data){
-            idx = Number(key);
-            if(idx && idx > max){
-                max = idx;
-            }
+            results.push( data[key] );
         }
-        max++;
-        data[max] = cb;
+        if(cb){
+            results.push( cb );
+        }
+        return results;
     };
 
 }).call(MicroservWrapper.prototype);

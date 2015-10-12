@@ -210,7 +210,7 @@ describe('Microservice Wrapper Testcases:', function(){
             }
         };
 
-        var result = microWrapper.parseArguments(args);
+        var result = microWrapper.parseServiceArgs(args);
         var data = result.data;
         var callback = result.callback
         var options = result.options;
@@ -224,7 +224,7 @@ describe('Microservice Wrapper Testcases:', function(){
     });
 
     it('tests createArguments helper function', function(done){
-        var argsJson = {
+        var json = {
             "0": 10,
             "1": {
                 "fast": "ball",
@@ -235,8 +235,11 @@ describe('Microservice Wrapper Testcases:', function(){
             return "callback";
         };
 
-        microWrapper.createArguments(argsJson, callback);
-        argsJson[2]().should.equal("callback");
+        var args = microWrapper.createServiceArgs(json, callback);
+        args[0].should.equal(10);
+        args[1].fast.should.equal("ball");
+        args[1].cricket.should.equal("bat");
+        args[2]().should.equal("callback");
         done();
     });
 });

@@ -76,13 +76,13 @@ Your config should have following fields.  \n\
         // unique service name
         var jobKey = serviceName + '.' + functionName;
         var me = this;
-        
+
         // return a wrapper function that fires the job
         return function(){
                 //console.log("called " + jobKey);
 
                 // pop data from arguments and make RPC call
-                var _a = me.parseArgumentsArray(arguments);
+                var _a = me.parseServiceArgs(arguments);
                 var data = _a.data;
                 var options = _a.options;
                 var cb = _a.callback;
@@ -124,8 +124,9 @@ Your config should have following fields.  \n\
 
         // create hook
         this.jobsClient.process( jobKey, function(job, done){
-            var _arguments = me.createArgumentsArray(job.data, done);
-            serviceInstance[functionName].apply(serviceInstance, _arguments);
+            var _data = me.createServiceArgs(job.data, done);
+            serviceInstance[functionName].apply(serviceInstance, _data);
+            return;
         });
     };
 
