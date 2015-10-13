@@ -8,7 +8,7 @@ var KUE_TIMEOUT = 5000;
 var DEBUG = false;
 
 var KueWrapper = function(){
-    MicroserviceWrapper.call(this);
+    MicroserviceWrapper.call(this); // override functions
     this.wrapperName = "kuewrapper";
     this.redisConfig = {};
 

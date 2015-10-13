@@ -1,8 +1,10 @@
+// This is an abstract class.
+
 'use strict';
 var BaseWrapper = require('./base');
 
 var DbWrapper = function(){
-    BaseWrapper.call(this);
+    BaseWrapper.call(this.super);
     this.wrapperName = "dbwrapper";
 };
 
@@ -23,7 +25,7 @@ DbWrapper.HELP_MSG = "\n\
             console.log(DbWrapper.HELP_MSG);
             throw new Error("Incorrect dbWrapper provides format");
         }
-        this.super.resolveConfig.call(this, plugin, base);
+        this.super.resolveConfig(plugin, base);
     };
 
     // derives setupPlugin from BaseWrapper class

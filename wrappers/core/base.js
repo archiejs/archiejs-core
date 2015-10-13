@@ -49,7 +49,6 @@ var BaseWrapper = function(){
         for(var serviceName in plugin.provides){
             var servicePath = resolve(base, modulePath, plugin.provides[serviceName]);
             serviceMap[serviceName] = require(servicePath);
-            console.log(servicePath);
         }
 
         plugin.wrappers = serviceMap;

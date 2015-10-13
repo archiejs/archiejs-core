@@ -1,14 +1,13 @@
 'use strict';
 var mongoose = require('mongoose');
 
-var DEBUG = true;
+var DEBUG = false;
 
 // TODO fix bug in deep inheritence
-//var DbWrapper = require('./../core').DbWrapper;
-var DbWrapper = require('./../core').BaseWrapper;
+var DbWrapper = require('./../core').DbWrapper;
 
 var MongodbWrapper = function(){
-    DbWrapper.call(this);
+    DbWrapper.call(this); // override functions
     this.wrapperName = "mongodbwrapper";
     this.__registerClass = true;
     this.mongoConfig = {};

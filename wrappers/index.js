@@ -1,5 +1,6 @@
 var core = require('./core');
 var redis = require('./redisMs');
+var MongoWr = require('./mongoDb'); // mongoose wrapper
 
 var DEBUG = false;
 
@@ -7,11 +8,8 @@ wrapperFactory = {
     "core": function() {
         return new core.BaseWrapper();
     },
-    "microservice": function() {
-        return new core.BaseWrapper();
-    },
-    "database": function() {
-        return new core.DbWrapper();
+    "mongodb": function() {
+        return new MongoWr();
     },
     "kue": function() {
         return new redis.KueWrapper();

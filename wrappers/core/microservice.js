@@ -1,3 +1,5 @@
+// This is an abstract class.
+
 'use strict';
 var resolve = require('path').resolve;
 var DEBUG = false;
@@ -5,7 +7,7 @@ var DEBUG = false;
 var BaseWrapper = require('./base');
 
 var MicroservWrapper = function(){
-    BaseWrapper.call(this);
+    BaseWrapper.call(this.super); // does not override functions
     this.wrapperName = "microservice";
 };
 
@@ -126,7 +128,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
         } else if (plugin.packageRole === 'server'){
             this.setupPluginServer(plugin, imports, register);
         } else {
-            this.super.setupPlugin.call(this, plugin, imports, register);
+            this.super.setupPlugin(plugin, imports, register);
         }
     };
 

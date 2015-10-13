@@ -47,6 +47,8 @@ var exports = {};
 
                 // if no, don't load setup function, etc and create hooks
                 plugin.packagePath = defaults.packagePath; // now has the file to load
+                plugin.provides = defaults.provides;
+                plugin.consumes = defaults.consumes;
 
                 // not all packages have a main entry point
                 // in which case require fails.
@@ -71,12 +73,19 @@ var exports = {};
             if (err.code !== "ENOENT") throw err;
         }
         var packageJson = packagePath && require(packagePath) || {};
+        if (packageJson && !packageJson.plugin){ // user friendly message
+            console.warn("WARNING from " + modulePath);
+            console.warn("NOTE: plugin:{...} key is missing in package.json"); 
+        }
+        
         var metadata = packagePath && packageJson.plugin || {};
+
         if (packagePath) {
             modulePath = dirname(packagePath);
-        } else
-        if (!packageJson) { // gets path to index.js, etc
-            modulePath = resolvePackage(base, modulePath);
+        } else {
+            try {
+                modulePath = resolvePackage(base, modulePath);
+            } catch(e) {}
         }
 
         // pacakgeJson - may not have a main entry point
@@ -138,6 +147,10 @@ var exports = {};
             plugin.packageWrapper = Wrappers.defaultWrapperName;
         }
         var wrapperInst = Wrappers.newWrapper(plugin.packageWrapper);
+        if(!wrapperInst){
+            var errmsg = "No registered wrapper with the name " + plugin.packageWrapper;
+            throw new Error(errmsg);
+        }
         wrapperInst.resolveConfig(plugin, base);
         plugin.packageWrapper = wrapperInst;
     }
