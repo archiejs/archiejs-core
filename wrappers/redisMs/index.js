@@ -1,3 +1,3 @@
-require('./../../misc.js');
+require('./../misc');
 
 module.exports.KueWrapper = require('./kueWrapper');

@@ -1,4 +1,4 @@
-require('./../../misc.js');
+require('./../misc');
 
 module.exports.BaseWrapper = require('./base');
 module.exports.MicroserviceWrapper = require('./microservice');

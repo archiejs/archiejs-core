@@ -1,6 +1,4 @@
 'use strict';
-var resolve = require('path').resolve;
-
 var BaseWrapper = require('./base');
 
 var DbWrapper = function(){
@@ -10,15 +8,25 @@ var DbWrapper = function(){
 
 DbWrapper.extends(BaseWrapper);
 
-DbWrapper.ERR_MSG1 = "";
+DbWrapper.HELP_MSG = "\n\
+  This wrapper employs the following provide structure in package.json file.\n\n\
+  provides: { \n\
+      DBObjA: 'fileA.js' , \n\
+      DBObjB: 'fileB.js' , \n\
+      ...    \n\
+  }\n";
 
 (function(){
     
     this.resolveConfig = function(plugin, base){
+        if(typeof plugin.provides !== 'object' || Array.isArray(plugin.provides)){
+            console.log(DbWrapper.HELP_MSG);
+            throw new Error("Incorrect dbWrapper provides format");
+        }
+        this.super.resolveConfig.call(this, plugin, base);
     };
-    
-    this.setupPlugin = function(plugin, imports, register){
-    };
+
+    // derives setupPlugin from BaseWrapper class
     
     /*
      * Abstract function
@@ -39,4 +47,3 @@ DbWrapper.ERR_MSG1 = "";
 }).call(DbWrapper.prototype);
 
 module.exports = DbWrapper;
-

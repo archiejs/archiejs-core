@@ -3,6 +3,7 @@ var resolve = require('path').resolve;
 
 var BaseWrapper = function(){
     this.wrapperName = "base";
+    this.__registerClass = false; // default
 };
 
 (function(){
@@ -19,7 +20,7 @@ var BaseWrapper = function(){
         if(!base) {
             throw new Error("base should be provided in arguments (use __dirname)");
         }
-        
+
         if(!plugin.packagePath) 
             throw new Error('packagePath missing in plugin');
 
@@ -48,6 +49,7 @@ var BaseWrapper = function(){
         for(var serviceName in plugin.provides){
             var servicePath = resolve(base, modulePath, plugin.provides[serviceName]);
             serviceMap[serviceName] = require(servicePath);
+            console.log(servicePath);
         }
 
         plugin.wrappers = serviceMap;
@@ -70,15 +72,24 @@ var BaseWrapper = function(){
      */
 
     this.setupPlugin = function(plugin, imports, register){
+        var registerClassLogic = this.__registerClass;
         // this function registers the wrappers
-        var registerWrappers = function(err, _serviceInstances){
+        var registerWrappers = function(err, _registerObjs){
             if(plugin.wrappers) {
-                for(var serviceName in plugin.wrappers){
-                    var instance = new plugin.wrappers[serviceName](plugin, imports, register);
-                    _serviceInstances[serviceName] = instance;
+                if (registerClassLogic){
+                    // at times we may just want to register the classes (ex. db wrappers)
+                    for(var serviceName in plugin.wrappers){
+                        _registerObjs[serviceName] = plugin.wrappers[serviceName];
+                    }
+                }else{
+                    // by default we want to register the instances
+                    for(var serviceName in plugin.wrappers){
+                        var instance = new plugin.wrappers[serviceName](plugin, imports, register);
+                        _registerObjs[serviceName] = instance;
+                    }
                 }
             }
-            return register(null, _serviceInstances);
+            return register(null, _registerObjs);
         }
 
         if(plugin.setup){

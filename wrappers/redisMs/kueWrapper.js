@@ -12,9 +12,9 @@ var KueWrapper = function(){
     this.wrapperName = "kuewrapper";
     this.redisConfig = {};
 
-    // todo
-    // check - is it better to register/unregister this in open/closeClient
-    process.once( 'SIGTERM', function (sig) {
+    // todo (check - is it better to register/unregister this in open/closeClient)
+    var me = this;
+    process.once( 'exit', function (sig) {
         me.closeClient();
     });
 };

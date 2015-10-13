@@ -1,7 +1,7 @@
-var DEBUG = false;
-
 var core = require('./core');
 var redis = require('./redisMs');
+
+var DEBUG = false;
 
 wrapperFactory = {
     "core": function() {

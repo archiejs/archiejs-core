@@ -1,0 +1,22 @@
+{
+  "name": "mongoDbWrapper",
+  "main": "index.js",
+  "version": "1.0.0",
+  "description": "mongodb wrapper classes.",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha test"
+  },
+  "devDependencies": {
+    "async": "^1.4.2",
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3"
+  },
+  "author": "Naval Saini <navalnovel@gmail.com> (http://www.flipflopapp.com/)",
+  "license": "ISC",
+  "dependencies": {
+    "mongoose": "^4.1.10"
+  }
+}
