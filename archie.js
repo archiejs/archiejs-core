@@ -11,10 +11,8 @@ var exports = {};
 (function () {
     var dirname = require('path').dirname;
     var resolve = require('path').resolve;
-    var exists = require('fs').exists || require('path').exists;
-    var realpath = require('fs').realpath;
-    var exists = require('fs').exists || require('path').exists;
-    var realpath = require('fs').realpath;
+    var existsSync = require('fs').existsSync || require('path').existsSync;
+    var realpathSync = require('fs').realpathSync;
     var packagePathCache = {};
 
     exports.loadConfig = loadConfig;
@@ -108,8 +106,8 @@ var exports = {};
         var newPath, newBase;
         if (packagePath[0] === "." || packagePath[0] === "/") {
             newPath = resolve(base, packagePath);
-            if (exists(newPath)) {
-                newPath = realpath(newPath);
+            if (existsSync(newPath)) {
+                newPath = realpathSync(newPath);
                 cache[packagePath] = newPath;
                 return newPath;
             }
@@ -117,8 +115,8 @@ var exports = {};
         else {
             while (base) {
                 newPath = resolve(base, "node_modules", packagePath);
-                if (exists(newPath)) {
-                    newPath = realpath(newPath);
+                if (existsSync(newPath)) {
+                    newPath = realpathSync(newPath);
                     cache[packagePath] = newPath;
                     return newPath;
                 }
