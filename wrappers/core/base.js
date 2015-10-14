@@ -42,14 +42,32 @@ var BaseWrapper = function(){
         // provides is a json ( of type, serviceName : file )
 
         var modulePath = plugin.packagePath;
-        var provides = Object.keys(plugin.provides);
+        var provides = []; 
         var consumes = plugin.consumes;
         var serviceMap = {};
 
-        for(var serviceName in plugin.provides){
-            var servicePath = resolve(base, modulePath, plugin.provides[serviceName]);
-            serviceMap[serviceName] = require(servicePath);
-        }
+        // creates a flat json with . (dots) in keys, instead of nestings.
+
+        var resolveFn = function(_servMap, prefix){
+            var _servicePath;
+            var _serviceName;
+            var pathOrObj;
+
+            for(var key in _servMap){
+                pathOrObj = _servMap[key];
+                _serviceName = prefix + key;
+                if(typeof pathOrObj === 'object'){ // nested object
+                    resolveFn (pathOrObj, _serviceName + ".");
+                    serviceMap[_serviceName] = pathOrObj;
+                }else{ // is path
+                    _servicePath = resolve(base, modulePath, pathOrObj);
+                    _servMap[key] = require(_servicePath);  // will be used to register the parent
+                    serviceMap[_serviceName] = _servMap[key]; // add shortcut to providers list x.y.z
+                }
+                provides.push(_serviceName);
+            }
+        };
+        resolveFn (plugin.provides, "");
 
         plugin.wrappers = serviceMap;
         plugin.provides = provides;
@@ -71,31 +89,59 @@ var BaseWrapper = function(){
      */
 
     this.setupPlugin = function(plugin, imports, register){
-        var registerClassLogic = this.__registerClass;
+        var registerClassLogic = plugin.__registerClass || this.__registerClass;
+
         // this function registers the wrappers
-        var registerWrappers = function(err, _registerObjs){
+        var registerWrappersFn = function(err, _registerObjs){
+
             if(plugin.wrappers) {
-                if (registerClassLogic){
-                    // at times we may just want to register the classes (ex. db wrappers)
-                    for(var serviceName in plugin.wrappers){
-                        _registerObjs[serviceName] = plugin.wrappers[serviceName];
+                var lastKey = " "; // an impossible key value
+                var subKey;
+                var tmpKey;
+                var mkObj;
+
+                plugin.provides.forEach(function(key){
+
+                    if ( lastKey.indexOf(key) === -1 ) {  // leaf
+                        //console.log(key + ' leaf');
+
+                        if (registerClassLogic) {
+                            // at times we may just want to register the classes (ex. db wrappers)
+                            _registerObjs[key] = plugin.wrappers[key];
+                        } else {
+                            // by default we want to register the instances
+                            mkObj = new plugin.wrappers[key] (plugin, imports, register);
+                            _registerObjs[key] = mkObj;
+                        }
+
+                    } else {  // non-leaf
+                        //console.log(key + ' non-leaf');
+
+                        mkObj = {};
+                        plugin.provides.forEach(function(subKey){
+                            if ( key === subKey ) { // break when it finds itself
+                                return false;
+                            }
+                            if ( subKey.indexOf(key) === 0 ) { // we found a subKey
+                                tmpKey = subKey.slice( key.length + 1 );
+                                mkObj[tmpKey] = _registerObjs[subKey]; // add
+                            }
+                        });
+                        _registerObjs[key] = mkObj;
+
                     }
-                }else{
-                    // by default we want to register the instances
-                    for(var serviceName in plugin.wrappers){
-                        var instance = new plugin.wrappers[serviceName](plugin, imports, register);
-                        _registerObjs[serviceName] = instance;
-                    }
-                }
+
+                    lastKey = key;
+                });
             }
             return register(null, _registerObjs);
-        }
+        };
 
         if(plugin.setup){
             // no wrappers are provided
-            return plugin.setup(plugin, imports, registerWrappers);
+            return plugin.setup(plugin, imports, registerWrappersFn);
         }else{
-            return registerWrappers(null, {});
+            return registerWrappersFn(null, {});
         }
     };
 

@@ -92,6 +92,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
                 if(typeof provide !== 'object' || provide.implementations === null || provide.interface === null){
                     console.warn("Skipping " + serviceName);
                     console.warn("...Please provide the implementation and interface files properly.");
+                    console.warn("...maybe if you have supplied us nested provides, you should know that they are not suppored by this wrapper.");
                     continue; // skip
                 }
                 tmpPath = resolve(base, modulePath, provide.interface);

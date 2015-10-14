@@ -62,7 +62,7 @@ describe('Base Wrapper Testcases:', function(){
         done();
     });
 
-    it('wrapper accepts json input and setups plugin', function(done){
+    it('wrapper setups the plugin with json input in provides', function(done){
         var config = {
             packagePath: 'test',
             provides: {
@@ -80,6 +80,65 @@ describe('Base Wrapper Testcases:', function(){
                 serviceMap.should.have.property('Obj2');
                 expect(serviceMap.Obj1).instanceof( require('./serviceObj1') );
                 expect(serviceMap.Obj2).instanceof( require('./serviceObj2') );
+                done();
+            }
+        );
+    });
+    
+    it('wrapper accepts nested json input', function(done){
+        var config = {
+            packagePath: 'test',
+            provides: {
+                'Parent1': {
+                    'Obj1': 'serviceObj1',
+                    'Obj2': 'serviceObj2'
+                },
+                'Parent2': {
+                    'Obj1': 'serviceObj1',
+                    'Obj2': 'serviceObj2'
+                }
+            }
+        };
+        baseWrapper.resolveConfig(config, basedir);
+       
+        config.provides.length.should.equal(6);
+        config.wrappers.should.have.property('Parent1.Obj1');
+        config.wrappers.should.have.property('Parent1.Obj2');
+        config.wrappers.should.have.property('Parent2.Obj1');
+        config.wrappers.should.have.property('Parent2.Obj2');
+        done();
+    });
+
+    it('wrapper accepts nested json input and setups plugin', function(done){
+        var config = {
+            packagePath: 'test',
+            provides: {
+                'Parent1': {
+                    'Obj1': 'serviceObj1',
+                    'Obj2': 'serviceObj2'
+                },
+                'Parent2': {
+                    'Obj1': 'serviceObj1',
+                    'Obj2': 'serviceObj2'
+                }
+            }
+        };
+        baseWrapper.resolveConfig(config, basedir);
+        baseWrapper.setupPlugin(config, {}, 
+            function(err, serviceMap){
+                if(err) {
+                    throw err;
+                }
+                serviceMap.should.have.property('Parent1');
+                serviceMap.should.have.property('Parent2');
+                config.wrappers.should.have.property('Parent1.Obj1');
+                config.wrappers.should.have.property('Parent1.Obj2');
+                config.wrappers.should.have.property('Parent2.Obj1');
+                config.wrappers.should.have.property('Parent2.Obj2');
+                expect(serviceMap.Parent1.Obj1).instanceof( require('./serviceObj1') );
+                expect(serviceMap.Parent1.Obj2).instanceof( require('./serviceObj2') );
+                expect(serviceMap.Parent2.Obj1).instanceof( require('./serviceObj1') );
+                expect(serviceMap.Parent2.Obj2).instanceof( require('./serviceObj2') );
                 done();
             }
         );
