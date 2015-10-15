@@ -12,11 +12,11 @@
   "devDependencies": {
     "async": "^1.4.2",
     "chai": "^3.3.0",
-    "mocha": "^2.3.3"
+    "mocha": "^2.3.3",
+    "mongoose": "^4.1.10"
   },
   "author": "Naval Saini <navalnovel@gmail.com> (http://www.flipflopapp.com/)",
   "license": "ISC",
   "dependencies": {
-    "mongoose": "^4.1.10"
   }
 }

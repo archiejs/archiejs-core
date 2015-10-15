@@ -17,6 +17,7 @@ var configTest = {
     provides: {
         'Person': 'schema.js'
     },
+    mongoose: require('mongoose'),
     server: {
         uri: 'mongodb://localhost/testDB'
     },
