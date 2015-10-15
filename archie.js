@@ -75,7 +75,7 @@ var exports = {};
         var packageJson = packagePath && require(packagePath) || {};
         if (packageJson && !packageJson.plugin){ // user friendly message
             console.warn("WARNING from " + modulePath);
-            console.warn("NOTE: plugin:{...} key is missing in package.json"); 
+            console.warn("NOTE: plugin:{...} is missing in package.json");
         }
 
         var metadata = packagePath && packageJson.plugin || {};
@@ -113,15 +113,14 @@ var exports = {};
             return cache[packagePath];
         }
         var newPath, newBase;
-        if (packagePath[0] === "." || packagePath[0] === "/") {
-            newPath = resolve(base, packagePath);
-            if (existsSync(newPath)) {
-                newPath = realpathSync(newPath);
-                cache[packagePath] = newPath;
-                return newPath;
-            }
+        
+        newPath = resolve(base, packagePath);
+        if (existsSync(newPath)) {
+            newPath = realpathSync(newPath);
+            cache[packagePath] = newPath;
+            return newPath;
         }
-        else {
+        else { // if we did not find the package, look for it in node_modules
             while (base) {
                 newPath = resolve(base, "node_modules", packagePath);
                 if (existsSync(newPath)) {
