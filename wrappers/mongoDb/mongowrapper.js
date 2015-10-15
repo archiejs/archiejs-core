@@ -1,7 +1,7 @@
 'use strict';
 var mongoose = require('mongoose');
 
-var DEBUG = false;
+var DEBUG = true;
 
 // TODO fix bug in deep inheritence
 var DbWrapper = require('./../core').DbWrapper;
@@ -9,7 +9,7 @@ var DbWrapper = require('./../core').DbWrapper;
 var MongodbWrapper = function(){
     DbWrapper.call(this); // override functions
     this.wrapperName = "mongodbwrapper";
-    this.__registerClass = true;
+    this.baseWrapper.__registerClass = true;
     this.mongoConfig = {};
 
     // todo (check - is it better to register/unregister this in open/closeClient)
@@ -33,12 +33,12 @@ Your config shold have following fields. \n\n\
 
 (function(){
 
-    this.setupPlugin = function(plugin, imports, register){
-        if(DEBUG) console.log('mongo: setupPlugin');
+    this.resolveConfig = function(plugin, base){
         if(!plugin.server){
             console.log(MongodbWrapper.HELP_MSG);
             throw new Error("Archiejs mongodb wrapper plugin should specify a server.");
         }
+        this.super.resolveConfig.call(this, plugin, base);
         this.mongoConfig = {
             uri: plugin.server.uri,
             options: {
@@ -46,10 +46,17 @@ Your config shold have following fields. \n\n\
                 pass: plugin.server.password || plugin.server.pass || ''
             },
             // Enable mongoose debug mode
-            debug: plugin.debug || process.env.MONGODB_DEBUG || false
+            debug: plugin.debug || process.env.MONGODB_DEBUG || DEBUG || false
         };
-        this.super.setupPlugin.call(this, plugin, imports, register);
-        this.openClient();
+    };
+
+    this.setupPlugin = function(plugin, imports, register){
+        if(DEBUG) console.log('mongo: setupPlugin');
+        var me = this;
+        this.openClient(function(err){
+            if(err) throw err;
+            me.super.setupPlugin.call(me, plugin, imports, register);
+        });
     };
 
     this.openClient = function(cb){
@@ -66,9 +73,9 @@ Your config shold have following fields. \n\n\
                     console.log(err);
                 } else {
                     mongoose.set('debug', me.mongoConfig.debug);
+                    if(DEBUG) console.log('mongo: mongoose connected');
                 }
-                if(cb)
-                    cb(err);
+                if(cb) cb(err);
             }
         );
     };

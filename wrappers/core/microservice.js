@@ -7,7 +7,7 @@ var DEBUG = false;
 var BaseWrapper = require('./base');
 
 var MicroservWrapper = function(){
-    BaseWrapper.call(this.super); // does not override functions
+    this.baseWrapper = new BaseWrapper(); // contains base class
     this.wrapperName = "microservice";
 };
 
@@ -29,6 +29,11 @@ MicroservWrapper.ERR_MSG2 = "\n\
     ... \n\
   }\n";
 
+MicroservWrapper.WARN_MSG1 = "\n\
+  WARNING! Please provide the implementation and interface files properly.\n\
+  Maybe if you have supplied us nested `plugin.provides`. You should know, \n\
+  that they are not suppored by `microservice` wrapper.\n";
+
 // public members
 (function(){
     /* resolveConfig function does following :-
@@ -44,13 +49,12 @@ MicroservWrapper.ERR_MSG2 = "\n\
      */
 
     this.resolveConfig = function(plugin, base){
-        if(!base) {
+        if(!base)
             throw new Error("base path must be provided in arguments");
-        }
+
         if(plugin.packageRole && !(plugin.packageRole === 'client' || plugin.packageRole === 'server'
-                || plugin.packageRole === 'default')) {
+                || plugin.packageRole === 'default'))
             throw new Error(MicroservWrapper.ERR_MSG1);
-        }
 
         if(plugin.packageRole === 'default') plugin.packageRole = null;
         plugin.wrappers = {};
@@ -74,7 +78,6 @@ MicroservWrapper.ERR_MSG2 = "\n\
         var implementations = {};
         var provide;
         var tmpPath;
-        var tmpObj;
 
         // parse the wrappers
 
@@ -82,31 +85,16 @@ MicroservWrapper.ERR_MSG2 = "\n\
             provide = plugin.provides[serviceName];
             if(typeof provide === 'string'){ // file
                 tmpPath = resolve(base, modulePath, provide);
-                tmpObj = require(tmpPath);
-
-                wrappers[serviceName] = tmpObj;
-                if (plugin.packageRole !== 'client'){
-                    implementations[serviceName] = tmpObj;
-                }
+                wrappers[serviceName] = tmpPath;
+                implementations[serviceName] = tmpPath;
             } else {
                 if(typeof provide !== 'object' || provide.implementations === null || provide.interface === null){
-                    console.warn("Skipping " + serviceName);
-                    console.warn("...Please provide the implementation and interface files properly.");
-                    console.warn("...maybe if you have supplied us nested provides, you should know that they are not suppored by this wrapper.");
+                    console.error("Skipping " + serviceName);
+                    console.warn(MicroservWrapper.WARN_MSG1);
                     continue; // skip
                 }
-                tmpPath = resolve(base, modulePath, provide.interface);
-                wrappers[serviceName] = require(tmpPath);
-
-                if (plugin.packageRole !== 'client'){
-                    tmpPath = resolve(base, modulePath, provide.implementation);
-                    implementations[serviceName] = require(tmpPath);
-
-                    // check for user mistake.
-                    if( JSON.stringify(implementations[serviceName]) === "{}" ){
-                        console.warn("Warning! looks like '" + serviceName + "' does not export any objects.");
-                    }
-                }
+                wrappers[serviceName] = resolve(base, modulePath, provide.interface);
+                implementations[serviceName] = resolve(base, modulePath, provide.implementation);
             }
         }
 
@@ -115,12 +103,13 @@ MicroservWrapper.ERR_MSG2 = "\n\
             plugin.provides = provides;
         }else if(plugin.packageRole === 'server'){
             plugin.provides = [];
+            plugin.implementations = implementations;
         }else{ // default
             plugin.provides = provides;
         }
 
+        
         plugin.wrappers = wrappers;
-        plugin.implementations = implementations;
     };
 
     this.setupPlugin = function(plugin, imports, register){
@@ -129,7 +118,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
         } else if (plugin.packageRole === 'server'){
             this.setupPluginServer(plugin, imports, register);
         } else {
-            this.super.setupPlugin(plugin, imports, register);
+            this.baseWrapper.setupPlugin(plugin, imports, register);
         }
     };
 
@@ -141,7 +130,7 @@ MicroservWrapper.ERR_MSG2 = "\n\
             var WrapperObj = function(){};
 
             // add functions to wrapper object
-            var ServiceObj = plugin.wrappers[serviceName];
+            var ServiceObj = require(plugin.wrappers[serviceName]);
             var proto = (ServiceObj.prototype) ? (ServiceObj.prototype) : (ServiceObj); // is an object or instance?
             Object.keys(proto) // wrap exposed functions
             .forEach(function(functionName){
@@ -184,8 +173,8 @@ MicroservWrapper.ERR_MSG2 = "\n\
 
                 // implementation
                 var serviceInstance;
-                var ServiceObj = plugin.implementations[serviceName];
-                var wrap = plugin.wrappers[serviceName];
+                var ServiceObj = require(plugin.implementations[serviceName]);
+                var wrap = require(plugin.wrappers[serviceName]);
                 if (ServiceObj.prototype){ // if this is an object
                     serviceInstance = new ServiceObj(plugin, imports); // make an instance
                 }else{

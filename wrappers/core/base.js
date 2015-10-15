@@ -61,8 +61,8 @@ var BaseWrapper = function(){
                     serviceMap[_serviceName] = pathOrObj;
                 }else{ // is path
                     _servicePath = resolve(base, modulePath, pathOrObj);
-                    _servMap[key] = require(_servicePath);  // will be used to register the parent
-                    serviceMap[_serviceName] = _servMap[key]; // add shortcut to providers list x.y.z
+                    _servMap[key] = _servicePath;
+                    serviceMap[_serviceName] = _servicePath; // add shortcut to providers list x.y.z
                 }
                 provides.push(_serviceName);
             }
@@ -90,28 +90,36 @@ var BaseWrapper = function(){
 
     this.setupPlugin = function(plugin, imports, register){
         var registerClassLogic = plugin.__registerClass || this.__registerClass;
+        var moduleCache = {}; // a cache of exported service object
+
+        // resolves a service object if it is not in path
+        var resolveModuleFn = function(path){
+            if (moduleCache[path])
+                return moduleCache[path];
+            moduleCache[path] = require(path);
+            return moduleCache[path];
+        };
 
         // this function registers the wrappers
         var registerWrappersFn = function(err, _registerObjs){
 
             if(plugin.wrappers) {
-                var lastKey = " "; // an impossible key value
                 var subKey;
                 var tmpKey;
                 var mkObj;
 
                 plugin.provides.forEach(function(key){
 
-                    if ( lastKey.indexOf(key) === -1 ) {  // leaf
+                    if ( typeof plugin.wrappers[key] === 'string' ) {  // leaf
                         //console.log(key + ' leaf');
 
+                        var Module = resolveModuleFn(plugin.wrappers[key]);
                         if (registerClassLogic) {
                             // at times we may just want to register the classes (ex. db wrappers)
-                            _registerObjs[key] = plugin.wrappers[key];
+                            _registerObjs[key] = Module;
                         } else {
                             // by default we want to register the instances
-                            mkObj = new plugin.wrappers[key] (plugin, imports, register);
-                            _registerObjs[key] = mkObj;
+                            _registerObjs[key] = new Module ( plugin, imports, register );
                         }
 
                     } else {  // non-leaf
@@ -131,7 +139,6 @@ var BaseWrapper = function(){
 
                     }
 
-                    lastKey = key;
                 });
             }
             return register(null, _registerObjs);

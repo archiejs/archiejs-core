@@ -4,11 +4,9 @@
 var BaseWrapper = require('./base');
 
 var DbWrapper = function(){
-    BaseWrapper.call(this.super);
+    this.baseWrapper = new BaseWrapper(); // contains base class
     this.wrapperName = "dbwrapper";
 };
-
-DbWrapper.extends(BaseWrapper);
 
 DbWrapper.HELP_MSG = "\n\
   This wrapper employs the following provide structure in package.json file.\n\n\
@@ -25,10 +23,12 @@ DbWrapper.HELP_MSG = "\n\
             console.log(DbWrapper.HELP_MSG);
             throw new Error("Incorrect dbWrapper provides format");
         }
-        this.super.resolveConfig(plugin, base);
+        this.baseWrapper.resolveConfig(plugin, base);
     };
 
-    // derives setupPlugin from BaseWrapper class
+    this.setupPlugin = function(plugin, imports, register){
+        this.baseWrapper.setupPlugin(plugin, imports, register);
+    };
     
     /*
      * Abstract function

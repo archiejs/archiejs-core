@@ -77,10 +77,10 @@ var exports = {};
             console.warn("WARNING from " + modulePath);
             console.warn("NOTE: plugin:{...} key is missing in package.json"); 
         }
-        
+
         var metadata = packagePath && packageJson.plugin || {};
 
-        if (packagePath) {
+       if (packagePath) {
             modulePath = dirname(packagePath);
         } else {
             try {
@@ -356,6 +356,11 @@ Archie.prototype.registerPlugin = function(plugin, next) {
                 return app.emit("error", err);
             }
             services[name] = provided[name];
+           
+            // check for user mistake - forgot module.exports.
+            if( isEmpty(services[name]) ){
+                console.warn("Warning! looks like service '" + name + "' does not exports or module.exports any objects.");
+            }
 
             if (typeof provided[name] != "function")
                 provided[name].name = name;
@@ -429,6 +434,13 @@ function createApp(config, callback) {
         callback(err, app);
     }
 
+}
+
+function isEmpty(obj){
+    for(var prop in obj){
+        return false;
+    }
+    return true;
 }
 
 module.exports = exports;
