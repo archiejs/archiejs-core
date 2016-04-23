@@ -1,0 +1,47 @@
+{
+
+  "set-success-1": [
+    {
+      "packagePath": "set1-modules/C",
+      "dataForC": "Module C called",
+      "provides": [ "call_C1-method", "call_C2_Method" ],
+      "consumes": [ "call_A_Method", "call_B_Method" ]
+    },
+    {
+      "packagePath": "set1-moduless/A",
+      "dataForA": "Module A called",
+      "provides": [ "call_A_Method" ],
+      "consumes": []
+    },
+    "set1-modules/D",
+    {
+      "packagePath": "set1-moduless/B",
+      "dataForB": "Module B called",
+      "provides": [ "call_B_Method" ],
+      "consumes": [ "call_A_Method" ]
+    }
+  ],
+
+  "set-fail-1": [
+    {
+      "packagePath": "set1-moduless/A",
+      "dataForA": "Module A called",
+      "provides": [ "call_A_Method" ],
+      "consumes": []
+    },
+    {
+      "packagePath": "set1-moduless/B",
+      "dataForB": "Module B called",
+      "provides": [ "call_B_Method" ],
+      "consumes": [ "call_A_Method", "call_Does_Not_Exist" ]
+    }
+  ],
+
+  "set-success-2": [
+    "set2-modules/D",
+    "set2-modules/C",
+    "set2-modules/B",
+    "set2-modules/A"
+  ]
+
+}
