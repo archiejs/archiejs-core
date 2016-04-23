@@ -1,6 +1,6 @@
 'use strict';
 
-require('./../../misc');
+require('./inherit');
 
 var chai = require('chai');
 var expect = chai.expect;
@@ -8,25 +8,28 @@ var should = chai.should();
 var resolve = require('path').resolve;
 var basedir = resolve(__dirname, '..');
 
-var BaseWrapper = require('./../').BaseWrapper;
-var ServiceObj = require('./serviceObj1.js');
+var Archiejs = require('./../../');
+var baseEnhancer;
 
-var baseWrapper = new BaseWrapper();
+describe('Base Enhancer Testcases:', function(){
 
-describe('Base Wrapper Testcases:', function(){
-
-    it('wrapper has a name', function(done){
-        baseWrapper.wrapperName.should.equal('base');
+    before(function(done) {
+        baseEnhancer = new Archiejs.BaseEnhancerClass();
         done();
     });
 
-    it('wrapper accepts strings in config', function(done){
+    it('enhancer has a name', function(done){
+        baseEnhancer.enhancerName.should.equal('base');
+        done();
+    });
+
+    it('enhancer accepts strings in config', function(done){
         var config = {
             packagePath: 'test',
             provides: 'something',
             consumes: 'something'
         };
-        baseWrapper.resolveConfig(config, basedir);
+        baseEnhancer.resolveConfig(config, basedir);
         Array.isArray(config.consumes).should.equal(true);
         Array.isArray(config.provides).should.equal(true);
         config.consumes[0].should.equal('something');
@@ -34,19 +37,19 @@ describe('Base Wrapper Testcases:', function(){
         done();
     });
 
-    it('wrapper accepts null in config', function(done){
+    it('enhancer accepts null in config', function(done){
         var config = {
             packagePath: 'test',
             consumes: null,
             provides: null
         };
-        baseWrapper.resolveConfig(config, basedir);
+        baseEnhancer.resolveConfig(config, basedir);
         config.consumes.length.should.equal(0);
         config.provides.length.should.equal(0);
         done();
     });
 
-    it('wrapper accepts json input in provides', function(done){
+    it('enhancer accepts json input in provides', function(done){
         var config = {
             packagePath: 'test',
             provides: {
@@ -54,15 +57,15 @@ describe('Base Wrapper Testcases:', function(){
                 'Obj2': 'serviceObj2'
             }
         };
-        baseWrapper.resolveConfig(config, basedir);
+        baseEnhancer.resolveConfig(config, basedir);
 
         config.provides.length.should.equal(2);
-        config.wrappers.should.have.property('Obj1');
-        config.wrappers.should.have.property('Obj2');
+        config.enhancers.should.have.property('Obj1');
+        config.enhancers.should.have.property('Obj2');
         done();
     });
 
-    it('wrapper setups the plugin with json input in provides', function(done){
+    it('enhancer setups the plugin with json input in provides', function(done){
         var config = {
             packagePath: 'test',
             provides: {
@@ -70,8 +73,8 @@ describe('Base Wrapper Testcases:', function(){
                 'Obj2': 'serviceObj2'
             }
         };
-        baseWrapper.resolveConfig(config, basedir);
-        baseWrapper.setupPlugin(config, {}, 
+        baseEnhancer.resolveConfig(config, basedir);
+        baseEnhancer.setupPlugin(config, {}, 
             function(err, serviceMap){
                 if(err) {
                     throw err;
@@ -85,7 +88,7 @@ describe('Base Wrapper Testcases:', function(){
         );
     });
     
-    it('wrapper accepts nested json input', function(done){
+    it('enhancer accepts nested json input', function(done){
         var config = {
             packagePath: 'test',
             provides: {
@@ -99,17 +102,17 @@ describe('Base Wrapper Testcases:', function(){
                 }
             }
         };
-        baseWrapper.resolveConfig(config, basedir);
+        baseEnhancer.resolveConfig(config, basedir);
        
         config.provides.length.should.equal(6);
-        config.wrappers.should.have.property('Parent1.Obj1');
-        config.wrappers.should.have.property('Parent1.Obj2');
-        config.wrappers.should.have.property('Parent2.Obj1');
-        config.wrappers.should.have.property('Parent2.Obj2');
+        config.enhancers.should.have.property('Parent1.Obj1');
+        config.enhancers.should.have.property('Parent1.Obj2');
+        config.enhancers.should.have.property('Parent2.Obj1');
+        config.enhancers.should.have.property('Parent2.Obj2');
         done();
     });
 
-    it('wrapper accepts nested json input and setups plugin', function(done){
+    it('enhancer accepts nested json input and setups plugin', function(done){
         var config = {
             packagePath: 'test',
             provides: {
@@ -123,18 +126,18 @@ describe('Base Wrapper Testcases:', function(){
                 }
             }
         };
-        baseWrapper.resolveConfig(config, basedir);
-        baseWrapper.setupPlugin(config, {}, 
+        baseEnhancer.resolveConfig(config, basedir);
+        baseEnhancer.setupPlugin(config, {}, 
             function(err, serviceMap){
                 if(err) {
                     throw err;
                 }
                 serviceMap.should.have.property('Parent1');
                 serviceMap.should.have.property('Parent2');
-                config.wrappers.should.have.property('Parent1.Obj1');
-                config.wrappers.should.have.property('Parent1.Obj2');
-                config.wrappers.should.have.property('Parent2.Obj1');
-                config.wrappers.should.have.property('Parent2.Obj2');
+                config.enhancers.should.have.property('Parent1.Obj1');
+                config.enhancers.should.have.property('Parent1.Obj2');
+                config.enhancers.should.have.property('Parent2.Obj1');
+                config.enhancers.should.have.property('Parent2.Obj2');
                 expect(serviceMap.Parent1.Obj1).instanceof( require('./serviceObj1') );
                 expect(serviceMap.Parent1.Obj2).instanceof( require('./serviceObj2') );
                 expect(serviceMap.Parent2.Obj1).instanceof( require('./serviceObj1') );

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var path = require('path');
-var archie = require("archie");
+var archie = require("./../../lib");
 
 var configPath = path.join(__dirname, "config.js");
 var config = archie.loadConfig(configPath);
