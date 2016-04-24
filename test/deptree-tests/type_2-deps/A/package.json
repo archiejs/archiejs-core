@@ -4,7 +4,7 @@
   "description": "dependes on nobody",
   "main": "index.js",
   "plugin": {
-    "provides": [  "A" ],
+    "provides": [ "A" ],
     "consumes": []
   },
   "scripts": {

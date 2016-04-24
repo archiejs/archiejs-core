@@ -1,8 +1,15 @@
 'use strict';
 
-var B = module.exports = function setup(options, imports) {
+var B = module.exports = function setup(options, imports, register) {
   this.options = options;
   this.imports = imports;
+
+  console.log(options);
+  console.log(imports);
+
+  register(null, {
+    "B": this
+  });
 }
 
 B.prototype.getOptions = function() {
