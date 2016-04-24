@@ -4,7 +4,7 @@
   "description": "",
   "plugin": {
     "provides": {
-      "A": "index.js"
+      "A": "a.js"
     },
     "consumes": []
   },
