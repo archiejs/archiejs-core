@@ -1,0 +1,15 @@
+{
+  "name": "c",
+  "version": "1.0.0",
+  "description": "dependes on A and B",
+  "main": "index.js",
+  "plugin": {
+    "provides": [ "C1", "C2" ],
+    "consumes": [ "A", "B" ]
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

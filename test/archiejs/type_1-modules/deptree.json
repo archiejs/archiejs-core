@@ -1,0 +1,21 @@
+[
+  {
+    "packagePath": "type_1-modules/C",
+    "dataForC": "Module C called",
+    "provides": [ "C1", "C2"],
+    "consumes": [ "A", "B" ]
+  },
+  {
+    "packagePath": "type_1-moduless/A",
+    "dataForA": "Module A called",
+    "provides": [ "A" ],
+    "consumes": []
+  },
+  "type_1-modules/D",
+  {
+    "packagePath": "type_1-moduless/B",
+    "dataForB": "Module B called",
+    "provides": [ "B" ],
+    "consumes": [ "A" ]
+  }
+]

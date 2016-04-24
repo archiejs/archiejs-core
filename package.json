@@ -17,9 +17,11 @@
   "scripts": {
     "test": "mocha test/base-enhancer-class"
   },
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "chai": "^3.3.0",
+    "chai-things": "^0.2.0",
     "mocha": "^2.3.3"
   },
   "optionalDependencies": {},
