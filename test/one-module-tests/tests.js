@@ -10,7 +10,7 @@ chai.use(require('chai-things'));
 
 var Archie= require('./../../');
 
-var deptrees = require( resolve(basedir, "deptrees_one.json") );
+var deptrees = require( resolve(basedir, "deptrees.json") );
 
 describe('Archiejs Dependency Manager Testcases:', function(){
 
@@ -20,7 +20,7 @@ describe('Archiejs Dependency Manager Testcases:', function(){
 
     Archie.createApp(tree, function(err, archie) {
       console.log("App is ready");
-      console.log(archie);
+      console.log(archie.services.A.whoAmI());
       done();
     });
   });
@@ -31,7 +31,7 @@ describe('Archiejs Dependency Manager Testcases:', function(){
 
     Archie.createApp(tree, function(err, archie) {
       console.log("App is ready");
-      console.log(archie);
+      console.log(archie.services.A.whoAmI());
       done();
     });
   });
@@ -42,7 +42,7 @@ describe('Archiejs Dependency Manager Testcases:', function(){
 
     Archie.createApp(tree, function(err, archie) {
       console.log("App is ready");
-      console.log(archie);
+      console.log(archie.services.A.whoAmI());
       done();
     });
   });
