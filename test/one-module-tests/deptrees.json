@@ -1,15 +1,15 @@
 {
   "type1": [
     {
-      "packagePath": "modules/A",
+      "packagePath": "modules/a-type1",
       "provides": [ "A" ],
       "consumes": []
     }
   ],
   "type2": [
-    "modules/A"
+    "modules/a-type2"
   ],
   "type3": [
-    "modules/A"
+    "modules/a-type3"
   ]
 }
