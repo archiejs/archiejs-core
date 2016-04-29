@@ -4,6 +4,7 @@ var D = module.exports = function setup(options, imports, register) {
   this.options = options;
   this.imports = imports;
 
+  console.log("Inside D :- \n");
   console.log(options);
   console.log(imports);
 

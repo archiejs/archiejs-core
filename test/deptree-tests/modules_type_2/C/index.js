@@ -4,11 +4,13 @@ var C = module.exports = function setup(options, imports, register) {
   this.options = options;
   this.imports = imports;
 
+  console.log("Inside C :- \n");
   console.log(options);
   console.log(imports);
 
   register(null, {
-    "C": this
+    "C1": this,
+    "C2": this
   });
 }
 
