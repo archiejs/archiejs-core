@@ -1,17 +1,19 @@
 'use strict';
 
-var C = module.exports = function setup(options, imports, register) {
+module.exports = function setup(options, imports, register) {
+  //console.log("Inside C :- \n");
+  register(null, {
+    "C": new C(options, imports),
+    "C_another": 
+        function() {
+          return "C_another";
+        }
+  });
+}
+
+var C = function(options, imports) {
   this.options = options;
   this.imports = imports;
-
-  console.log("Inside C :- \n");
-  console.log(options);
-  console.log(imports);
-
-  register(null, {
-    "C1": this,
-    "C2": this
-  });
 }
 
 C.prototype.getOptions = function() {
@@ -22,10 +24,6 @@ C.prototype.getImports = function() {
   return this.imports;
 }
 
-C.prototype.call_C1_Method = function() {
-  return "C1";
-}
-
-C.prototype.call_C2_Method = function() {
-  return "C2";
+C.prototype.getName = function() {
+  return "C";
 }

@@ -4,8 +4,8 @@
   "description": "dependes on A and B",
   "main": "index.js",
   "plugin": {
-    "provides": [ "C1", "C2" ],
-    "consumes": [ ]
+    "provides": [ "C", "C_another" ],
+    "consumes": [ "A", "B" ]
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

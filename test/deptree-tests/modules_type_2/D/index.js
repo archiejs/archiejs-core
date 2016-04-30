@@ -1,16 +1,14 @@
 'use strict';
 
-var D = module.exports = function setup(options, imports, register) {
+module.exports = function setup(options, imports, register) {
+  register(null, {
+    "D": new D(options, imports)
+  });
+}
+
+var D = function(options, imports) {
   this.options = options;
   this.imports = imports;
-
-  console.log("Inside D :- \n");
-  console.log(options);
-  console.log(imports);
-
-  register(null, {
-    "D": this
-  });
 }
 
 D.prototype.getOptions = function() {
@@ -19,4 +17,8 @@ D.prototype.getOptions = function() {
 
 D.prototype.getImports = function() {
   return this.imports;
+}
+
+D.prototype.getName = function() {
+  return "D";
 }
