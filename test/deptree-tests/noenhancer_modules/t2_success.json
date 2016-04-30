@@ -1,0 +1,13 @@
+[
+  {
+    "packagePath": "F_nopack",
+    "data": "F called",
+    "provides": "F",
+    "consumes": "G"
+  },
+  {
+    "packagePath": "G_nopack",
+    "data": "G called",
+    "provides": "G"
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "name": "a",
+  "version": "1.0.0",
+  "description": "dependes on nobody",
+  "main": "index.js",
+  "plugin": {
+    "provides": [ "E1", "E2" ],
+    "consumes": []
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
