@@ -1,0 +1,17 @@
+{
+  "name": "a",
+  "version": "1.0.0",
+  "description": "dependes on nobody",
+  "plugin": {
+    "provides": {
+      "C": "c1.js",
+      "C_another": "c2.js"
+    },
+    "consumes": [ "A", "B" ]
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
