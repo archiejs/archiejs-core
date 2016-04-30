@@ -18,7 +18,7 @@ function assertService(serv, num_dependencies, name) {
 describe('Archiejs Dependency Manager Testcases:', function(){
 
   it('successfully resolves dependencies in modules that have', function(done) {
-    var configPath = resolve( __dirname, "noenhancer_modules/t1_success.json" );
+    var configPath = resolve( __dirname, "modules/t1_success.json" );
     var tree = Archie.loadConfig(configPath);
     Archie.createApp(tree, function(err, archie) {
       // basic checks
@@ -40,7 +40,7 @@ describe('Archiejs Dependency Manager Testcases:', function(){
   });
 
   it('successfully resolves dependencies in modules that dont have package.json', function(done) {
-    var configPath = resolve( __dirname, "noenhancer_modules/t2_success.json" );
+    var configPath = resolve( __dirname, "modules/t2_success.json" );
     var tree = Archie.loadConfig(configPath);
     Archie.createApp(tree, function(err, archie) {
       // basic checks
@@ -56,7 +56,7 @@ describe('Archiejs Dependency Manager Testcases:', function(){
   });
 
   it('fails because of missing dependency', function(done) {
-    var configPath = resolve( __dirname, "noenhancer_modules/t3_fail.json" );
+    var configPath = resolve( __dirname, "modules/t3_fail.json" );
     var tree = Archie.loadConfig(configPath);
     Archie.createApp(tree, function(err, archie) {
       assert.isNotNull(err);
@@ -65,7 +65,7 @@ describe('Archiejs Dependency Manager Testcases:', function(){
   });
 
   it('fails because it forgot to register', function(done) {
-    var configPath = resolve( __dirname, "noenhancer_modules/t4_fail.json" );
+    var configPath = resolve( __dirname, "modules/t4_fail.json" );
     var tree = Archie.loadConfig(configPath);
     Archie.createApp(tree, function(err, archie) {
       assert.isNotNull(err);
