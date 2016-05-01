@@ -14,5 +14,5 @@ A.prototype.getImports = function() {
 }
 
 A.prototype.getName = function() {
-  return "C1";
+  return "C_another";
 }

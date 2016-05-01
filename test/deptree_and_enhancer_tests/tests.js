@@ -25,13 +25,11 @@ describe('Archiejs Dependency Manager Testcases:', function(){
       assert(!err, "got an error : " + err);
       assert.isNotNull(archie);
 
-      // function services
-      assert.equal(archie.services.C_another(), "C_another");
-
       // object services
       assertService(archie.getService("A"), 0, "A");
       assertService(archie.services.B, 1, "B");
       assertService(archie.services.C, 2, "C");
+      assertService(archie.services.C_another, 2, "C_another");
 
       assert.equal(archie.services.D, null);
 

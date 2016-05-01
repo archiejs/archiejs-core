@@ -28,3 +28,5 @@ node_modules
 
 # Temporary file created by redis server
 dump.rdb
+
+.DS_Store
