@@ -3,13 +3,26 @@
 Archie is largely derived from Architech.js (written by c9). Most of this documentation is
 also copied as it is from Architect (and mentions of Architect is changed to Archie).
 
+1. Organizing nodejs project into small independent modules, with their
+   own node_modules package versioning.
+2. Using static dependency checking between modules at time of starting
+   the project.
+3. Extremely suitable for TDD (and comes with a boilerplate code to
+   setup a nodejs webproject).
+4. Applying enhancers to modules - which can convert objects into
+   dbtables or wrap them using microservices.
+
+## Differences with archietect.js
+
 The differences are as follows,
 
 1. Removed AMD support for brower modules.
 2. Added new fields to plugins.
 3. Added more logs in case of a failure while initializing a plugin.
 
-This is a simple but powerful structure for Node.js applications. Using Archie/Architect,
+## Brief
+
+This is a simple but powerful structure for Node.js applications. Using ArchieJs,
 you set up a simple configuration and tell Archie which plugins you want to load. Each
 plugin registers itself with Archie, so other plugins can use its functions. Plugins can
 be maintained as NPM packages so they can be dropped in to other Archie apps.
@@ -68,25 +81,11 @@ actually be in npm, it can be a simple folder in the code tree.
 
 ## Config Format
 
-The `loadConfig` function below can read an architect config file.  This file can be either JSON or JS (or anything that node's require can read).
-
-The sample calculator app has a config like this:
-
-```js
-module.exports = [
-  { packagePath: "architect-http", port: 8080 },
-  { packagePath: "architect-http-static", root: "www" },
-  "./plugins/calculator",
-  "./plugins/db",
-  "./plugins/auth"
-]
-```
+The `loadConfig` function below can read an architect config file.  This file can be either JSON or JS (or anything that node's require can read). See under test directory (ex, /tests/deptree_xxx ) on different ways of setting up archiejs projects.
 
 Notice that the config is a list of plugin config options.  If the only option in the config is `packagePath`, then a string can be used in place of the object.  If you want to pass other options to the plugin when it's being created, you can put arbitrary properties here.
 
 The `plugin` section in each plugin's package.json is also merged in as a prototype to the main config.  This is where `provides` and `consumes` properties are usually set.
-
-In ArchieJs, a new key added to `plugin` section - `type` can have a value (one of these) `microserver`, `service`, `api`, `none` (default). Given the type, a wrapper is created for the object and appropriate means are used whenever a function call is made to this object. For example, if type is microserver, the calls are made via redis kue RPC. (TODO: to add 'socket' plugin type).
 
 
 ## Archie main API
@@ -100,6 +99,7 @@ This function starts an architect config.  The return value is an `Archie` insta
 ### loadConfig(configPath)
 
 This is a sync function that loads a config file and parses all the plugins into a proper config object for use with `createApp`.  While this uses sync I/O all steps along the way are memoized and I/O only occurs on the first invocation.  It's safe to call this in an event loop provided a small set of configPaths are used.
+
 
 ## Class: Archie
 
