@@ -37,4 +37,13 @@ describe('Archiejs Dependency Manager Testcases:', function(){
     });
   });
 
+  it('fails to load module with conflict (provides plugin in enhancer format and also a "main" file/setup function via package.json)', function(done) {
+    var configPath = resolve( __dirname, "modules/t2_fail.json" );
+    var tree = Archie.loadConfig(configPath);
+    Archie.createApp(tree, function(err, archie) {
+      assert(err != null, "we were expecting an error");
+      done();
+    });
+  });
+
 });

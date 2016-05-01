@@ -5,7 +5,7 @@
   "main": "index.js",
   "plugin": {
     "provides": {
-      "A": "a.js"
+      "D": "a.js"
     },
     "consumes": []
   },

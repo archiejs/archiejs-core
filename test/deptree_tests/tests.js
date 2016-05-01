@@ -59,7 +59,7 @@ describe('Archiejs Dependency Manager Testcases:', function(){
     var configPath = resolve( __dirname, "modules/t3_fail.json" );
     var tree = Archie.loadConfig(configPath);
     Archie.createApp(tree, function(err, archie) {
-      assert.isNotNull(err);
+      assert(err != null);
       done();
     });
   });
@@ -68,7 +68,7 @@ describe('Archiejs Dependency Manager Testcases:', function(){
     var configPath = resolve( __dirname, "modules/t4_fail.json" );
     var tree = Archie.loadConfig(configPath);
     Archie.createApp(tree, function(err, archie) {
-      assert.isNotNull(err);
+      assert(err != null);
       assert.equal(err.toString(), "Error: Plugin failed to provide E1 service.");
       done();
     });
