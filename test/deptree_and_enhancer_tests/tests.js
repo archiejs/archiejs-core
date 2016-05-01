@@ -46,4 +46,14 @@ describe('Archiejs Dependency Manager Testcases:', function(){
     });
   });
 
+  it('fails to load module with wrong path', function(done) {
+    var configPath = resolve( __dirname, "modules/t3_fail.json" );
+    var tree = Archie.loadConfig(configPath);
+    Archie.createApp(tree, function(err, archie) {
+      console.log(archie);
+      assert(err != null, "we were expecting an error");
+      done();
+    });
+  });
+
 });
