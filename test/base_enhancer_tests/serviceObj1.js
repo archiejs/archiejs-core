@@ -1,6 +1,7 @@
-var ServiceObj = function(){
+var ServiceObj = function(config, imports, done){
     this.value = 0;
     this.comments = [];
+    done();
 };
 
 (function(){
@@ -13,7 +14,7 @@ var ServiceObj = function(){
         this.value -= num ;
         this.commend.push(str);
     };
-    
+
     this.mult = function(num, str){
         this.value += num ;
         this.commend.push(str);

@@ -1,7 +1,8 @@
-var ServiceObj = function(){
+var ServiceObj = function(config, imports, done){
     this.func1_count = 0;
     this.func2_count = 0;
     this.func3_count = 0;
+    done();
 };
 
 (function(){
@@ -12,7 +13,7 @@ var ServiceObj = function(){
     this.func2 = function(){
         this.func2_count++;
     };
-    
+
     this.func3 = function(){
         this.func3_count++;
     };

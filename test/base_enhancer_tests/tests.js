@@ -25,7 +25,7 @@ describe('Base Enhancer Testcases:', function(){
 
     it('enhancer accepts strings in config', function(done){
         var config = {
-            packagePath: 'base_enhancer_class',
+            packagePath: 'base_enhancer_tests',
             provides: 'something',
             consumes: 'something'
         };
@@ -39,7 +39,7 @@ describe('Base Enhancer Testcases:', function(){
 
     it('enhancer accepts null in config', function(done){
         var config = {
-            packagePath: 'base_enhancer_class',
+            packagePath: 'base_enhancer_tests',
             consumes: null,
             provides: null
         };
@@ -51,7 +51,7 @@ describe('Base Enhancer Testcases:', function(){
 
     it('enhancer accepts json input in provides', function(done){
         var config = {
-            packagePath: 'base_enhancer_class',
+            packagePath: 'base_enhancer_tests',
             provides: {
                 'Obj1': 'serviceObj1',
                 'Obj2': 'serviceObj2'
@@ -67,7 +67,7 @@ describe('Base Enhancer Testcases:', function(){
 
     it('enhancer setups the plugin with json input in provides', function(done){
         var config = {
-            packagePath: 'base_enhancer_class',
+            packagePath: 'base_enhancer_tests',
             provides: {
                 'Obj1': 'serviceObj1',
                 'Obj2': 'serviceObj2'
@@ -90,7 +90,7 @@ describe('Base Enhancer Testcases:', function(){
     
     it('enhancer accepts nested json input', function(done){
         var config = {
-            packagePath: 'base_enhancer_class',
+            packagePath: 'base_enhancer_tests',
             provides: {
                 'Parent1': {
                     'Obj1': 'serviceObj1',
@@ -114,7 +114,7 @@ describe('Base Enhancer Testcases:', function(){
 
     it('enhancer accepts nested json input and setups plugin', function(done){
         var config = {
-            packagePath: 'base_enhancer_class',
+            packagePath: 'base_enhancer_tests',
             provides: {
                 'Parent1': {
                     'Obj1': 'serviceObj1',
