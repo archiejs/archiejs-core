@@ -1,14 +1,14 @@
 'use strict';
 
-module.exports = function setup(options, imports, register) {
+module.exports = function setup(options, imports) {
   //console.log("Inside C :- \n");
-  register(null, {
+  return {
     "C": new C(options, imports),
     "C_another": 
         function() {
           return "C_another";
         }
-  });
+  };
 }
 
 var C = function(options, imports) {

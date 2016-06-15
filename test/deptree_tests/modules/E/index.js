@@ -1,9 +1,9 @@
 'use strict';
 
-module.exports = function setup(options, imports, register) {
+module.exports = function setup(options, imports) {
   // forget to provide E1, that nobody is consuming
-  register(null, {
+  return {
 //    E1: function() {},
     E2: function() {}
-  });
+  };
 }

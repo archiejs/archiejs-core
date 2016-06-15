@@ -1,9 +1,9 @@
 'use strict';
 
-module.exports = function setup(options, imports, register) {
-  register(null, {
+module.exports = function setup(options, imports) {
+  return {
     "D": new D(options, imports)
-  });
+  };
 }
 
 var D = function(options, imports) {

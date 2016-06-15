@@ -1,5 +1,4 @@
 
-module.exports = function setup(options, imports, register) {
+module.exports = function setup(options, imports) {
   console.log("in setup function");
-  register();
 }

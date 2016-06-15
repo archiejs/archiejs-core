@@ -1,10 +1,10 @@
 'use strict';
 
-module.exports = function setup(options, imports, register) {
+module.exports = function setup(options, imports) {
   //console.log("Inside B :- \n");
-  register(null, {
+  return {
     "B": new B(options, imports)
-  });
+  };
 }
 
 var B = function(options, imports) {
