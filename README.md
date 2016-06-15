@@ -11,6 +11,9 @@ also copied as it is from Architect (and mentions of Architect is changed to Arc
    setup a nodejs webproject).
 4. Applying enhancers to modules - which can convert objects into
    dbtables or wrap them using microservices.
+5. The modules act like Java packages, where they make limited
+   functionality publicaly available.
+
 
 ## Differences with archietect.js
 
@@ -20,12 +23,22 @@ The differences are as follows,
 2. Added new fields to plugins.
 3. Added more logs in case of a failure while initializing a plugin.
 
-## Brief
+
+## Differences with NPM modules
+
+ArchieJS modules are mostly meant for custom application logic - which
+you might later want to reuse in similar applications (maybe this makes
+sense if you are a services company). It increases code reusablity,
+makes it easier to split the application into micro-services and
+visualize your webapp as a number of boxes and pipes connecting them
+(see provides and consumes below).
+
+
+## Brief pitch about ArchieJs
 
 This is a simple but powerful structure for Node.js applications. Using ArchieJs,
 you set up a simple configuration and tell Archie which plugins you want to load. Each
-plugin registers itself with Archie, so other plugins can use its functions. Plugins can
-be maintained as NPM packages so they can be dropped in to other Archie apps.
+plugin registers itself with Archie, so other plugins can use its functions. 
 
 
 ## Plugin Interface
@@ -37,9 +50,12 @@ be maintained as NPM packages so they can be dropped in to other Archie apps.
  * @options is the hash of options the user passes in when creating an instance
  * of the plugin.
  * @imports is a hash of all services this plugin consumes.
- * @register is the callback to be called when the plugin is done initializing.
+ *
+ * Returns
+ * @returns one or more services provided/exported by the module
  */
-module.exports = function setup(options, imports, register) {
+
+module.exports = function setup(options, imports) {
 
   // "database" was a service this plugin consumes
   var db = imports.database;
@@ -83,6 +99,7 @@ actually be in npm, it can be a simple folder in the code tree.
     }
 }
 ```
+
 
 ## Config Format
 
