@@ -105,10 +105,6 @@ actually be in npm, it can be a simple folder in the code tree.
 
 The `loadConfig` function below can read an architect config file.  This file can be either JSON or JS (or anything that node's require can read). See under test directory (ex, /tests/deptree_xxx ) on different ways of setting up archiejs projects.
 
-Notice that the config is a list of plugin config options.  If the only option in the config is `packagePath`, then a string can be used in place of the object.  If you want to pass other options to the plugin when it's being created, you can put arbitrary properties here.
-
-The `plugin` section in each plugin's package.json is also merged in as a prototype to the main config.  This is where `provides` and `consumes` properties are usually set.
-
 
 ## Archie main API
 
