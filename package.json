@@ -18,6 +18,7 @@
     "test": "mocha test/base-enhancer-class"
   },
   "dependencies": {
+    "debug": "^2.2.0"
   },
   "devDependencies": {
     "chai": "^3.3.0",
