@@ -74,18 +74,14 @@ describe('Base Enhancer Testcases:', function(){
             }
         };
         baseEnhancer.resolveConfig(config, basedir);
-        baseEnhancer.setupPlugin(config, {}, 
-            function(err, serviceMap){
-                if(err) {
-                    throw err;
-                }
+        baseEnhancer.setupPlugin(config, {})
+            .then((serviceMap) => {
                 serviceMap.should.have.property('Obj1');
                 serviceMap.should.have.property('Obj2');
                 expect(serviceMap.Obj1).instanceof( require('./serviceObj1') );
                 expect(serviceMap.Obj2).instanceof( require('./serviceObj2') );
                 done();
-            }
-        );
+            });
     });
     
     it('enhancer accepts nested json input', function(done){
@@ -127,11 +123,8 @@ describe('Base Enhancer Testcases:', function(){
             }
         };
         baseEnhancer.resolveConfig(config, basedir);
-        baseEnhancer.setupPlugin(config, {}, 
-            function(err, serviceMap){
-                if(err) {
-                    throw err;
-                }
+        baseEnhancer.setupPlugin(config, {})
+            .then((serviceMap) => { 
                 serviceMap.should.have.property('Parent1');
                 serviceMap.should.have.property('Parent2');
                 config.enhancers.should.have.property('Parent1.Obj1');
@@ -143,8 +136,7 @@ describe('Base Enhancer Testcases:', function(){
                 expect(serviceMap.Parent2.Obj1).instanceof( require('./serviceObj1') );
                 expect(serviceMap.Parent2.Obj2).instanceof( require('./serviceObj2') );
                 done();
-            }
-        );
+            });
     });
 
 });

@@ -1,10 +1,10 @@
 'use strict';
 
-var A = module.exports = function setup(options, imports, registerFn) {
+var A = module.exports = function setup(options, imports) {
   console.log(__dirname);
-  registerFn(null, {
+  return {
     "A": this
-  });
+  };
 }
 
 A.prototype.whoAmI = function() {
