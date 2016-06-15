@@ -44,7 +44,12 @@ module.exports = function setup(options, imports, register) {
   // "database" was a service this plugin consumes
   var db = imports.database;
 
-  register(null, {
+  // USEFUL TIP :-
+  // can throw an error
+  // can return a Promise
+  // or can return a value, as below
+
+  return {
     // "auth" is a service this plugin provides
     auth: {
       users: function (callback) {
@@ -59,7 +64,7 @@ module.exports = function setup(options, imports, register) {
         });
       }
     }
-  });
+  };
 };
 ```
 
