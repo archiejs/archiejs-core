@@ -19,7 +19,7 @@ also copied as it is from Architect (and mentions of Architect is changed to Arc
 
 The differences are as follows,
 
-1. Removed AMD support for brower modules.
+1. Removed AMD support for browser modules.
 2. Added new fields to plugins.
 3. Added more logs in case of a failure while initializing a plugin.
 
