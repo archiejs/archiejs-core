@@ -17,7 +17,7 @@ function assertService(serv, num_dependencies, name) {
 
 describe('Archiejs Dependency Manager Testcases:', function(){
 
-  it('successfully resolves dependencies in modules that have', function(done) {
+  it('successfully resolves dependencies in modules', function(done) {
     var configPath = resolve( __dirname, "modules/t1_success.json" );
     var tree = Archie.loadConfig(configPath);
     Archie.createApp(tree, function(err, archie) {
