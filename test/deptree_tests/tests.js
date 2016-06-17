@@ -63,7 +63,7 @@ describe('Archiejs Dependency Manager Testcases:', function(){
       done();
     });
   });
-
+ 
   it('fails because it forgot to register', function(done) {
     var configPath = resolve( __dirname, "modules/t4_fail.json" );
     var tree = Archie.loadConfig(configPath);
