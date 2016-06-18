@@ -2,9 +2,9 @@
 
 module.exports = function setup(options, imports) {
   //console.log("Inside B :- \n");
-  return {
+  return Promise.resolve({
     "B": new B(options, imports)
-  };
+  });
 }
 
 var B = function(options, imports) {

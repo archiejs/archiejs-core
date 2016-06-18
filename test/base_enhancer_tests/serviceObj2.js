@@ -1,8 +1,7 @@
-var ServiceObj = function(config, imports, done){
+var ServiceObj = function(config, imports){
     this.func1_count = 0;
     this.func2_count = 0;
     this.func3_count = 0;
-    done();
 };
 
 (function(){

@@ -1,7 +1,6 @@
-var ServiceObj = function(config, imports, done){
+var ServiceObj = function(config, imports){
     this.value = 0;
     this.comments = [];
-    done();
 };
 
 (function(){
