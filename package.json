@@ -1,7 +1,7 @@
 {
   "name": "archiejs",
   "description": "A Simple yet powerful plugin system for node applications",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Naval Saini <navalnovel@gmail.com>",
   "contributors": [
     {
