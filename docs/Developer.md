@@ -59,6 +59,7 @@ Archie object provides a function with the name, getServices. We can use it to a
 
 ## package.json
 
+```
 {
     ...
     plugins: {
@@ -67,15 +68,18 @@ Archie object provides a function with the name, getServices. We can use it to a
         messaging: 'one of the possible types'
     }
 }
+```
 
 
 ### Config that loads packages
 
+```
 {
     packagePath: '...',
     key1: '...',
     key2: 123
 }
+```
 
 During the initialization part, the plugins from package.json are merged into the config that is present in the memory. This combined structure is returned by `loadConfig` function and is supposed to be passed into `createApp`.
 
@@ -83,8 +87,10 @@ During the initialization part, the plugins from package.json are merged into th
 
 The callback to `createApp` function contains the `app` datastructure. This datastructure is used both internally and also provided to the user. Its contents are as follows :-
 
+```
 {
     services: {...},   // a hash of services in this app
     config: {...},     // the config defined in the last section
     event: {}          // events emitted by Archie object (ready, error, etc)
 }
+```
