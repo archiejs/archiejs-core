@@ -3,15 +3,20 @@
 ArchieJs is a way of breaking up large nodejs projects into independent modules
 and solves the tight coupling problem. 
 
-Each module can provide for and consume from other modules. A module is similar to java packages, or dependency injection frameworks; and have a lifecycle, ie. they are initialized and terminated (optional). 
+Each module can provide for and consume from other modules. A module is similar 
+to java packages, or dependency injection frameworks; and have a lifecycle, ie. 
+they are initialized and terminated (optional). 
 
-Other features are built on top of this modular architecture - such as easily breaking up the projects into different microservies, or having to write lesser boiler plate code, etc.
+Other features are built on top of this modular architecture - such as easily 
+breaking up the projects into different microservies, or having to write lesser 
+boiler plate code, etc.
 
 
 ## Advantages
 
-1. Loose coupling: Organizing nodejs project into small independent modules. The modules act 
-   like Java packages, where they make limited functionality publicaly available.
+1. Loose coupling: Organizing nodejs project into small independent modules using dependency
+   injection. The modules act like Java packages, where they make limited functionality 
+   publicaly available.
 2. Manage lifecycle of modules: Archiejs knows the dependencies between different modules in 
    the project and initializes them in the right sequence. (In the next versions, this can be 
    built on to manage lifecycle events of modules).
@@ -26,9 +31,8 @@ Other features are built on top of this modular architecture - such as easily br
 
 ## Project Background
 
-ArchieJs is derived from Architech.js (written by c9). ArchitectJs was difficult to work with
-as it did not provide friendly error messages for novice users and also it was complex, because
-it is meant for writing isomorphic code. 
+ArchieJs is derived from Architech.js (written by c9) and have several improvements. It is simpler,
+provides friendly error messages for novice users and is no longer an isomorphic nodejs framework. 
 
 The differences between ArchieJs and Archietect are as follows,
 
@@ -42,6 +46,7 @@ The differences between ArchieJs and Archietect are as follows,
 
 ArchieJS modules are mostly meant for custom application logic - which
 you might later want to reuse in similar applications.
+
 It increases code reusablity, makes it easier to split the application 
 into micro-services and visualize your webapp as a number of boxes and pipes 
 connecting them (see `provides` and `consumes` below).
@@ -85,7 +90,7 @@ module.exports = function setup(options, imports) {
   // can return a value, as below
 
   return {
-    // "auth" is a service this plugin provides
+    // "auth" is a service this module provides
     auth: {
       users: function (callback) {
         db.keys(callback);
@@ -103,8 +108,7 @@ module.exports = function setup(options, imports) {
 };
 ```
 
-Each plugin is a node module complete with a package.json file.  It need not
-actually be in npm, it can be a simple folder in the code tree.
+Each module has a package.json file (see `plugin` key below).
 
 ```json
 {
@@ -119,6 +123,9 @@ actually be in npm, it can be a simple folder in the code tree.
 }
 ```
 
+If your archie module has multiple javascript files that provide services, there 
+is a more convenient way of defining the same in package.json (see the `demo-` apps 
+or `test` folders).
 
 ## Archie main API
 
