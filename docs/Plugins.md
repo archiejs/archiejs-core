@@ -144,10 +144,6 @@ We mostly recommend the other ways. This is something legacy from architect.js a
     });
 
 
-## What `packageWrapper` types are available in Archiejs?
-
-TODO
-
 
 
 
