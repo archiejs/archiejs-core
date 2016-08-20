@@ -1,7 +1,7 @@
 # ArchieJs introduction
 
-ArchieJs is a way of breaking up large nodejs projects into independent modules
-and solves the tight coupling problem. 
+ArchieJs is a dependency injection library for breaking up large nodejs projects into independent
+loosely coupled modules.
 
 Each module can provide for and consume from other modules. A module is similar 
 to java packages, or dependency injection frameworks; and have a lifecycle, ie. 
@@ -45,7 +45,10 @@ The differences between ArchieJs and Archietect are as follows,
 ## ArchieJs modules vs NPM modules
 
 ArchieJS modules are mostly meant for custom application logic - which
-you might later want to reuse in similar applications.
+you might later want to reuse in similar applications. The are like NPM
+modules, with life cycle management and dependency injection.
+
+## ArchieJs module semantics
 
 It increases code reusablity, makes it easier to split the application 
 into micro-services and visualize your webapp as a number of boxes and pipes 
@@ -60,7 +63,7 @@ plugin: {
 }
 ```
 
-See `test` folder or `demo-` apps for more details.
+See test folder or demo apps for more details.
 
 
 ## Plugin Interface
