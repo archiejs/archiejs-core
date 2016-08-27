@@ -1,7 +1,7 @@
 {
   "name": "archiejs",
   "description": "A Simple yet powerful plugin system for node applications",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "author": "Naval Saini <navalnovel@gmail.com>",
   "contributors": [
     {
@@ -15,7 +15,7 @@
     "url": "https://github.com/flipflopapp/archiejs.git"
   },
   "scripts": {
-    "test": "mocha test/base-enhancer-class"
+    "test": "./node_modules/mocha/bin/mocha test/*/*.js"
   },
   "dependencies": {
     "debug": "^2.2.0"
