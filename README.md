@@ -1,15 +1,10 @@
 # ArchieJs introduction
 
-ArchieJs is a dependency injection library for breaking up large nodejs projects into independent
-loosely coupled modules.
+ArchieJs is a dependency chaining library, for breaking up large nodejs projects into independent loosely coupled modules. An Archiejs application is assembled together from modules, using recipes provided in json object. It's simpler than it sounds and great for maintaing a large codebase over a long period of time.
 
-Each module can provide for and consume from other modules. A module is similar 
-to java packages, or dependency injection frameworks; and have a lifecycle, ie. 
-they are initialized and terminated (optional). 
+Business logic is written in modules. Each module can provide for and consume from other modules. A module is similar to java packages (for a comparision). A module has a lifecycle, ie. they are initialized and terminated (optional). 
 
-Other features are built on top of this modular architecture - such as easily 
-breaking up the projects into different microservies, or having to write lesser 
-boiler plate code, etc.
+((Other features are built on top of this modular architecture - such as tools, breaking a monolith into different microservies, etc, etc.))
 
 
 ## Advantages
