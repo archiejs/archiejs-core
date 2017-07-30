@@ -6,22 +6,7 @@ The business logic is written in modules. Each module can `provide for` and `con
 
 (( Other features are built on top of this modular architecture - such as tools, breaking a monolith into different microservies, etc, etc. ))
 
-
-## Advantages
-
-1. Loose coupling: Organizing nodejs project into small independent modules using dependency
-   injection. The modules act like Java packages, where they make limited functionality 
-   publicaly available.
-2. Manage lifecycle of modules: Archiejs knows the dependencies between different modules in 
-   the project and initializes them in the right sequence. (In the next versions, this can be 
-   built on to manage lifecycle events of modules).
-3. Better testing: Each module will have its own suite of testcases.
-4. Better maintainablity: Each module can have its own versioning of npm modules. One archiejs module
-   can use an older version of an npm module, while the newer written once use newer versions.
-   (see section on differences with npm modules below)
-5. Lesser boilerplate: Applying enhancers to modules and reduce boiler plate code. For example,
-   we can can convert objects into db-tables or wrap them using microservices,
-   using existing enhancers (see `demo-webapp-mongo-redis-ticket_booking`).
+Read in more detail here: https://github.com/archiejs/archiejs-docs
 
 
 ## Project Background
@@ -42,6 +27,8 @@ The differences between ArchieJs and Archietect are as follows,
 ArchieJS modules are mostly meant for custom application logic - which
 you might later want to reuse in similar applications. They are like NPM
 modules, with life cycle management and dependency injection. 
+
+Read in more detail here: https://github.com/archiejs/archiejs-docs
 
 ## ArchieJs module semantics
 
