@@ -1,10 +1,16 @@
 # ArchieJs introduction
 
-ArchieJs is a dependency chaining library, for breaking up large nodejs projects into independent loosely coupled modules. An Archiejs application is assembled together from interdependent modules, using recipes provided in json object. It's simpler than it sounds and great for maintaing a large codebase over a longer period of time.
+Archiejs enforces the tenets of modular design on nodejs codebases.
+
+* Strong encapsulation
+* Well defined interfaces
+* Explicit dependencies
+
+ArchieJs is a dependency chaining library, for breaking up large nodejs projects into independent loosely coupled modules. 
+
+An Archiejs application is assembled together from interdependent modules, using recipes provided in json object. It's simpler than it sounds and great for maintaing a large codebase over a longer period of time.
 
 The business logic is written in modules. Each module can `provide for` and `consume from` other modules. Isolation of a module is similar to java packages (for a comparision). A module also has a lifecycle, ie. they are initialized, provide services to their consumers and terminated (optional). 
-
-(( Other features are built on top of this modular architecture - such as tools, breaking a monolith into different microservies, etc, etc. ))
 
 Read in more detail here: https://github.com/archiejs/archiejs-docs
 
@@ -20,15 +26,6 @@ The differences between ArchieJs and Archietect are as follows,
 2. Made it more usefriendly by adding more logs and friendlier error messages.
 3. Added support for enhancers and new ways to define `provides` and `consumes` tags.
 4. Added support for promises during module initialization sequence. 
-
-
-## ArchieJs modules vs NPM modules
-
-ArchieJS modules are mostly meant for custom application logic - which
-you might later want to reuse in similar applications. They are like NPM
-modules, with life cycle management and dependency injection. 
-
-Read in more detail here: https://github.com/archiejs/archiejs-docs
 
 ## ArchieJs module semantics
 
