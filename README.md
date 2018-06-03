@@ -113,14 +113,11 @@ or `test` folders).
 
 The Archiejs library exposes two functions as it's main API.
 
-### createApp(configObject, [callback])
+### createApp(configObject)
 
 This function starts an archie config. The config object is created using `resolveConfig`.
 
-The return value is an `Archie` instance. One can listen for `error` and `ready` events.
-
-The optional callback has two arguments - `error` and `Archie` instance (usual nodejs
-back style).
+The return value is Promise with an `Archie` instance.
 
 ### resolveConfig(configTree)
 
@@ -143,10 +140,6 @@ Name is the short name for the service, and service is the actual object with fu
 ### Event: "plugin" (module)
 
 When a module registers, this event is emitted.
-
-### Event: "ready" (app)
-
-When all plugins are done, the "ready" event is emitted.  The value is the Archie instance itself.
 
 ### Event: "error" (error)
 

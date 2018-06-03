@@ -139,9 +139,8 @@ We mostly recommend the other ways. This is something legacy from architect.js a
 ### 2. Launch the app
 
     var architect = require('architect');
-    architect.createApp(tree, function() {
-        console.log('Application started');
-    });
+    var app = await architect.createApp(tree);
+    console.log('application started')
 
 
 

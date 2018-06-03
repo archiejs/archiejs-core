@@ -17,61 +17,59 @@ function assertService(serv, num_dependencies, name) {
 
 describe('Archiejs Dependency Manager Testcases:', function(){
 
-  it('successfully resolves dependencies in modules that have', function(done) {
+  it('successfully resolves dependencies in modules that have', async function() {
     var configPath = resolve( __dirname, "modules/t1_success.json" );
     var tree = Archie.loadConfig(configPath);
-    Archie.createApp(tree, function(err, archie) {
-      // basic checks
-      assert(!err, "got an error : " + err);
-      assert.isNotNull(archie);
+    var archie = await Archie.createApp(tree);
 
-      // function services
-      assert.equal(archie.services.C_another(), "C_another");
+    // basic checks
+    assert.isNotNull(archie);
 
-      // object services
-      assertService(archie.getService("A"), 0, "A");
-      assertService(archie.services.B, 1, "B");
-      assertService(archie.services.C, 2, "C");
+    // function services
+    assert.equal(archie.services.C_another(), "C_another");
 
-      assert.equal(archie.services.D, null);
+    // object services
+    assertService(archie.getService("A"), 0, "A");
+    assertService(archie.services.B, 1, "B");
+    assertService(archie.services.C, 2, "C");
 
-      done();
-    });
+    assert.equal(archie.services.D, null);
   });
 
-  it('successfully resolves dependencies in modules that dont have package.json', function(done) {
+  it('successfully resolves dependencies in modules that dont have package.json', async function() {
     var configPath = resolve( __dirname, "modules/t2_success.json" );
     var tree = Archie.loadConfig(configPath);
-    Archie.createApp(tree, function(err, archie) {
-      // basic checks
-      assert(!err, "got an error : " + err);
-      assert.isNotNull(archie);
+    var archie = await Archie.createApp(tree);
+    assert.isNotNull(archie);
 
-      // object services
-      assertService(archie.services.F, 1, "F");
-      assertService(archie.services.G, 0, "G");
-
-      done();
-    });
+    // object services
+    assertService(archie.services.F, 1, "F");
+    assertService(archie.services.G, 0, "G");
   });
 
-  it('fails because of missing dependency', function(done) {
+  it('fails because of missing dependency', async function() {
     var configPath = resolve( __dirname, "modules/t3_fail.json" );
     var tree = Archie.loadConfig(configPath);
-    Archie.createApp(tree, function(err, archie) {
+    try {
+      await Archie.createApp(tree)
+    } catch (err) {
       assert(err != null);
-      done();
-    });
+      return;
+    }
+    throw new Error('should fail');
   });
  
-  it('fails because it forgot to register', function(done) {
+  it('fails because it forgot to register', async function() {
     var configPath = resolve( __dirname, "modules/t4_fail.json" );
     var tree = Archie.loadConfig(configPath);
-    Archie.createApp(tree, function(err, archie) {
+    try {
+      await Archie.createApp(tree)
+    } catch (err) {
       assert(err != null);
       assert.equal(err.toString(), "Error: Plugin failed to provide E1 service.");
-      done();
-    });
+      return;
+    }
+    throw new Error('should fail');
   });
 
 });

@@ -22,40 +22,25 @@ function assertTree(tree){
 
 describe('Archiejs Dependency Manager Testcases:', function(){
 
-  it('tests creating an app with one type 1 module', function(done) {
+  it('tests creating an app with one type 1 module', async function() {
     var tree = Archie.resolveConfig(deptrees["type1"], basedir);
     assertTree(tree);
-    Archie.createApp(tree, function(err, archie) {
-      if (err) {
-        throw err;
-      }
-      assert.isNotNull(archie.services.A);
-      done();
-    });
+    var archie = await Archie.createApp(tree);
+    assert.isNotNull(archie.services.A);
   });
 
-  it('tests creating an app with one type 2 module', function(done) {
+  it('tests creating an app with one type 2 module', async function() {
     var tree = Archie.resolveConfig(deptrees["type2"], basedir);
     assertTree(tree);
-    Archie.createApp(tree, function(err, archie) {
-      if (err) {
-        throw err;
-      }
-      assert.isNotNull(archie.services.A);
-      done();
-    });
+    var archie = await Archie.createApp(tree);
+    assert.isNotNull(archie.services.A);
   });
   
-  it('tests creating an app with one type 3 module', function(done) {
+  it('tests creating an app with one type 3 module', async function() {
     var tree = Archie.resolveConfig(deptrees["type3"], basedir);
     assertTree(tree);
-    Archie.createApp(tree, function(err, archie) {
-      if (err) {
-        throw err;
-      }
-      assert.isNotNull(archie.services.A);
-      done();
-    });
+    var archie = await Archie.createApp(tree);
+    assert.isNotNull(archie.services.A);
   });
 
 });
