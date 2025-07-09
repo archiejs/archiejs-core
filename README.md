@@ -1,3 +1,7 @@
+# DEPRECATED
+
+I have not maintained this for a long time.
+
 # ArchieJs introduction
 
 Archiejs enforces the tenets of modular design on nodejs codebases.
